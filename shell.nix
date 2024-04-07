@@ -1,0 +1,93 @@
+{ pkgs ? (
+    let
+      inherit (builtins) fetchTree fromJSON readFile;
+      inherit ((fromJSON (readFile ./flake.lock)).nodes) nixpkgs gomod2nix;
+    in
+    import (fetchTree nixpkgs.locked) {
+      overlays = [
+        (import "${fetchTree gomod2nix.locked}/overlay.nix")
+      ];
+    }
+  )
+, mkGoEnv ? pkgs.mkGoEnv
+, gomod2nix ? pkgs.gomod2nix
+, pre-commit-hooks
+}:
+
+let
+  goEnv = mkGoEnv { pwd = ./.; };
+  pre-commit-check = pre-commit-hooks.lib.${pkgs.system}.run {
+    src = ./.;
+    hooks = {
+      gofmt.enable = true;
+      # golangci-lint = {
+      #   enable = true;
+      #   name = "golangci-lint";
+      #   description = "Lint application";
+      #   files = "\.go$";
+      #   entry = "${pkgs.golangci-lint}/bin/golangci-lint run --new-from-rev HEAD --fix ./organizations/...";
+      #   require_serial = true;
+      #   pass_filenames = false;
+      # };
+      goimports = {
+        enable = true;
+        name = "goimports";
+        description = "Format application";
+        files = "\.go$";
+        entry =
+          let
+            script = pkgs.writeShellScript "precommit-goimports" ''
+              set -e
+              failed=false
+              for file in "$@"; do
+                # redirect stderr so that violations and summaries are properly interleaved.
+                if ! ${pkgs.gotools}/bin/goimports -l -d "$file" 2>&1; then
+                  failed=true
+                fi
+              done
+              if [[ $failed == "true" ]]; then
+                exit 1
+              fi
+            '';
+          in
+          builtins.toString script;
+      };
+    };
+  };
+in
+pkgs.mkShell {
+  inherit (pre-commit-check) shellHook;
+
+  packages = [
+    goEnv
+    gomod2nix
+    pkgs.bun
+    pkgs.delve
+    pkgs.ent
+    pkgs.go_1_22
+    pkgs.go-junit-report
+    pkgs.golangci-lint
+    pkgs.goreleaser
+    pkgs.go-task
+    pkgs.gotestsum
+    pkgs.gotools
+    pkgs.nodejs
+    pkgs.overmind
+    pkgs.protobuf3_20
+    pkgs.protoc-gen-go
+    pkgs.protoc-gen-go-grpc
+    pkgs.stdenv.cc.cc.lib
+  ];
+
+  buildInputs = [
+    pkgs.gtk3
+    pkgs.webkitgtk
+  ];
+
+  nativeBuildInputs = [
+    pkgs.pkg-config
+  ];
+
+  LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath [ pkgs.stdenv.cc.cc pkgs.gtk3 pkgs.webkitgtk ];
+  # PKG_CONFIG_PATH = pkgs.lib.makeLibraryPath [ pkgs.gtk3 pkgs.webkitgtk ];
+}
