@@ -12,14 +12,16 @@ import (
 var assets embed.FS
 
 func main() {
-	// Create an instance of the app structure
 	app := NewApp()
 
-	// Create application with options
 	err := wails.Run(&options.App{
-		Title:  "panel",
-		Width:  1024,
-		Height: 768,
+		Title:            "Panel",
+		Width:            1024,
+		Height:           768,
+		DisableResize:    false,
+		Fullscreen:       false,
+		WindowStartState: options.Maximised,
+		// Frameless:        true,
 		AssetServer: &assetserver.Options{
 			Assets: assets,
 		},
@@ -29,7 +31,6 @@ func main() {
 			app,
 		},
 	})
-
 	if err != nil {
 		println("Error:", err.Error())
 	}

@@ -66,9 +66,7 @@ pkgs.mkShell {
   packages = [
     goEnv
     gomod2nix
-    pkgs.bun
     pkgs.delve
-    pkgs.ent
     pkgs.go_1_22
     pkgs.go-junit-report
     pkgs.golangci-lint
@@ -78,10 +76,8 @@ pkgs.mkShell {
     pkgs.gotools
     pkgs.nodejs
     pkgs.overmind
-    pkgs.protobuf3_20
-    pkgs.protoc-gen-go
-    pkgs.protoc-gen-go-grpc
     pkgs.stdenv.cc.cc.lib
+    pkgs.yarn
   ];
 
   buildInputs = [

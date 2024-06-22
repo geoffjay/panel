@@ -1,28 +1,27 @@
-import {useState} from 'react';
-import logo from './assets/images/logo-universal.png';
+import { BeakerIcon } from '@heroicons/react/24/solid'
+
 import './App.css';
-import {Greet} from "../wailsjs/go/main/App";
 
 function App() {
-    const [resultText, setResultText] = useState("Please enter your name below 👇");
-    const [name, setName] = useState('');
-    const updateName = (e: any) => setName(e.target.value);
-    const updateResultText = (result: string) => setResultText(result);
-
-    function greet() {
-        Greet(name).then(updateResultText);
-    }
-
-    return (
-        <div id="App">
-            <img src={logo} id="logo" alt="logo"/>
-            <div id="result" className="result">{resultText}</div>
-            <div id="input" className="input-box">
-                <input id="name" className="input" onChange={updateName} autoComplete="off" name="input" type="text"/>
-                <button className="btn" onClick={greet}>Greet</button>
-            </div>
-        </div>
-    )
+  return (
+    <div className="min-h-screen grid grid-cols-1 place-items-center justify-items-center mx-auto py-8">
+      <div className="text-2xl font-bold font-mono">
+        <h1 className="content-center">Vite + React + TS + Tailwind</h1>
+      </div>
+      <div className="w-fit max-w-md">
+        <button className="btn">
+          <BeakerIcon className="size-8" />
+          Button
+        </button>
+        <button className="btn btn-neutral">Neutral</button>
+        <button className="btn btn-primary">Primary</button>
+        <button className="btn btn-secondary">Secondary</button>
+        <button className="btn btn-accent">Accent</button>
+        <button className="btn btn-ghost">Ghost</button>
+        <button className="btn btn-link">Link</button>
+      </div>
+    </div>
+  )
 }
 
 export default App
