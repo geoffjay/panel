@@ -1,2 +1,2 @@
 app: wails dev
-frontend: cd frontend && bun run dev
+frontend: wails frontend:dev:watcher
