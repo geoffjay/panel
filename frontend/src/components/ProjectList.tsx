@@ -35,7 +35,7 @@ const ProjectList: React.FC = () => {
               {projects.map((project) => (
                 <tr key={project.path} className="hover">
                   <td>
-                    <RectangleGroupIcon className="h-6 w-6 text-gray-500" />
+                    <RectangleGroupIcon className="h-6 w-6" />
                   </td>
                   <td>{project.path}</td>
                   <td>{project.description}</td>
