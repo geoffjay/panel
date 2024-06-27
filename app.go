@@ -5,11 +5,10 @@ import (
 	"fmt"
 	"io/fs"
 	"os"
+	"panel/config"
 	"path/filepath"
 	"strings"
 
-	"github.com/wailsapp/wails/v2/pkg/menu"
-	"github.com/wailsapp/wails/v2/pkg/menu/keys"
 	"github.com/wailsapp/wails/v2/pkg/runtime"
 )
 
@@ -23,6 +22,8 @@ type Project struct {
 // App struct
 type App struct {
 	ctx context.Context
+
+	Config *config.Config
 }
 
 // NewApp creates a new App application struct
@@ -32,22 +33,6 @@ func NewApp() *App {
 
 func (a *App) startup(ctx context.Context) {
 	a.ctx = ctx
-}
-
-func (a *App) menu() *menu.Menu {
-	appMenu := menu.NewMenu()
-	fileMenu := appMenu.AddSubmenu("File")
-	fileMenu.AddText("&Open", keys.CmdOrCtrl("o"), openFile)
-	fileMenu.AddSeparator()
-	fileMenu.AddText("Quit", keys.CmdOrCtrl("q"), func(_ *menu.CallbackData) {
-		runtime.Quit(a.ctx)
-	})
-
-	return appMenu
-}
-
-func openFile(data *menu.CallbackData) {
-	fmt.Println("Open File")
 }
 
 func (a *App) GetProjects() []Project {
@@ -68,6 +53,11 @@ func (a *App) GetProjects() []Project {
 
 		if d.IsDir() && strings.Count(path, string(os.PathSeparator)) > maxDepth {
 			return fs.SkipDir
+		}
+
+		// if the directory does not contain a file named "panel.yml" then skip it
+		if _, err := os.Stat(filepath.Join(root, path, "panel.yml")); os.IsNotExist(err) {
+			return nil
 		}
 
 		info, derr := d.Info()
@@ -91,4 +81,21 @@ func (a *App) GetProjects() []Project {
 	}
 
 	return result
+}
+
+func (a *App) LoadProject(path string) error {
+	var err error
+
+	filename := filepath.Join(path, "panel.yml")
+	fmt.Println("Load Project: ", filename)
+
+	a.Config, err = config.GetConfig(filename)
+	if err != nil {
+		fmt.Println("Error loading config: ", err)
+		return err
+	}
+
+	runtime.WindowSetTitle(a.ctx, a.Config.App.Title)
+
+	return nil
 }

@@ -1,0 +1,63 @@
+---
+app:
+  title: Panel Example
+  subtitle: Example panel configuration
+
+layout:
+  variables:
+    - id: value-0
+      type: float
+    - id: value-1
+      type: float
+      default: 0.0
+  components:
+    - type: stack
+      direction: vertical
+      children:
+        - type: panel
+          title: Measurements
+          subtitle: Acquisition inputs
+          children:
+            - type: stack
+              direction: horizontal
+              children:
+                - type: stat
+                  title: Input 1
+                  value: ${value-0}
+                  description: Analog measurement
+        - type: panel
+          title: Signals
+          subtitle: Acquisition outputs
+          children:
+            - type: range
+              title: Output 1
+              value: ${value-1}
+
+logging:
+  columns:
+    - id: col-0
+      label: AI0
+      type: float
+      format: "%.2f"
+    - id: col-1
+      label: AO0
+      type: float
+      format: "%.2f"
+
+acquisition:
+  channels:
+    - id: ai-0
+      type: input
+    - id: ao-0
+      type: output
+
+connection:
+  connections:
+    - producer: ai-0
+      consumer:
+        - col-0
+        - value-0
+    - producer: value-1
+      consumer:
+        - ao-0
+        - col-1

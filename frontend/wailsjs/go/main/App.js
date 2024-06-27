@@ -5,3 +5,7 @@
 export function GetProjects() {
   return window['go']['main']['App']['GetProjects']();
 }
+
+export function LoadProject(arg1) {
+  return window['go']['main']['App']['LoadProject'](arg1);
+}

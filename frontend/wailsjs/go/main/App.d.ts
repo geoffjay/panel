@@ -3,3 +3,5 @@
 import {main} from '../models';
 
 export function GetProjects():Promise<Array<main.Project>>;
+
+export function LoadProject(arg1:string):Promise<void>;
