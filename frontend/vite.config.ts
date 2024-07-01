@@ -6,6 +6,7 @@ import { fileURLToPath, URL } from "node:url";
 export default defineConfig({
   resolve: {
     alias: {
+      "~root": fileURLToPath(new URL("./src", import.meta.url)),
       "~components": fileURLToPath(new URL("./src/components", import.meta.url)),
       "~features": fileURLToPath(new URL("./src/features", import.meta.url)),
       "~wails": fileURLToPath(new URL("./wailsjs", import.meta.url)),
