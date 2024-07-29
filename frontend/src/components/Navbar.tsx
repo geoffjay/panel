@@ -1,6 +1,7 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeftIcon, ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import { Cog8ToothIcon, PowerIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
 
 import { Quit } from "~wails/runtime";
 
@@ -8,20 +9,20 @@ import { AppContext } from "~root/App";
 
 const Navbar = () => {
   const appContext = useContext(AppContext);
-  const [menuOpen, setMenuOpen] = useState(false);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigate = useNavigate();
 
   if (!appContext) {
     throw new Error("Navbar must be rendered within AppProvider");
   }
 
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
+  const toggleDrawer = () => {
+    setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const handleSettings = () => {
-    navigate("/settings");
-    toggleMenu();
+  const handleNavigate = (path) => {
+    setIsDrawerOpen(false);
+    navigate(path);
   };
 
   const themeColor = appContext.darkMode ? "bg-base-100" : "bg-neutral-content";
@@ -29,7 +30,7 @@ const Navbar = () => {
 
   return (
     <>
-      <div id="navbar" className={`navbar ${themeColor} py-0 px-2 min-h-2 h-12`}>
+      <div id="navbar" className={`navbar ${themeColor} py-0 px-2 min-h-2 h-12 z-10`}>
         <div className="flex-1">
           <div className="flex gap-2">
             <button className="btn btn-sm btn-square btn-ghost">
@@ -41,41 +42,63 @@ const Navbar = () => {
           </div>
         </div>
         <div className="flex-none">
-          <ul className="menu">
-            <li>
-              <button onClick={toggleMenu} className={`btn btn-sm btn-square btn-ghost ${iconColor}`}>
-                <Bars3Icon className="h-5 w-5" />
-              </button>
-            </li>
-          </ul>
-        </div>
-      </div>
-      {menuOpen && (
-        <div id="menu" className="bg-base-100 border border-neutral-content z-10 shadow-xl rounded-lg p-4 w-[200px] mt-1 mr-1 top-12 right-0 absolute">
-          <div className="divide-y divide-neutral-content">
-            <ul className="pb-2">
-              <li>
-                <button
-                  className="btn btn-ghost btn-block px-0 text-left"
-                  onClick={handleSettings}
-                >
-                  Settings
-                </button>
-              </li>
-            </ul>
-            <ul className="pt-2">
-              <li>
-                <button
-                  className="btn btn-ghost btn-block px-0 text-left"
-                  onClick={Quit}
-                >
-                  Quit
-                </button>
-              </li>
-            </ul>
+          <div className="drawer drawer-end">
+            <input id="drawer" type="checkbox" checked={isDrawerOpen} className="drawer-toggle" />
+            <div className="drawer-content">
+              <ul className="menu">
+                <li>
+                  <label
+                    htmlFor="drawer"
+                    className={`drawer-button btn btn-sm btn-square btn-ghost ${iconColor}`}
+                    onClick={toggleDrawer}
+                  >
+                    <Bars3Icon className="h-5 w-5" />
+                  </label>
+                </li>
+              </ul>
+            </div>
+            <div className="drawer-side">
+              <label
+                htmlFor="drawer"
+                aria-label="close sidebar"
+                onClick={toggleDrawer}
+                className="drawer-overlay"
+              ></label>
+              <ul className="bg-base-200 flex flex-col min-h-full w-[400px] py-2">
+                <div className="flex-1">
+                  <li>
+                    <button
+                      className="btn btn-sm btn-ghost btn-block px-4 justify-start align-middle text-xs"
+                      onClick={() => handleNavigate("/settings")}
+                    >
+                      <Cog8ToothIcon className="h-4 w-4" />
+                      Settings
+                    </button>
+                  </li>
+                  <li>
+                    <button
+                      className="btn btn-sm btn-ghost btn-block px-4 justify-start align-middle text-xs"
+                      onClick={() => handleNavigate("/components")}
+                    >
+                      <PuzzlePieceIcon className="h-4 w-4" />
+                      Components
+                    </button>
+                  </li>
+                </div>
+                <li className="flex-none">
+                  <button
+                    className="btn btn-sm btn-ghost btn-block px-4 justify-start align-middle text-xs"
+                    onClick={Quit}
+                  >
+                    <PowerIcon className="h-4 w-4" />
+                    Quit
+                  </button>
+                </li>
+              </ul>
+            </div>
           </div>
         </div>
-      )}
+      </div>
     </>
   );
 };
