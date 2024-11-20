@@ -16,7 +16,7 @@ interface AppProviderProps {
 
 const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
   const [context, setContext] = useState<AppContextType>({
-    darkMode: true,
+    darkMode: false,
     setDarkMode: (darkMode: boolean) => setContext({ ...context, darkMode }),
   });
 
@@ -30,9 +30,9 @@ const AppProvider: React.FC<AppProviderProps> = ({ children }) => {
 const App: React.FC = () => {
   return (
     <AppProvider>
-      <div className="min-h-screen bg-neutral-content grid grid-cols-1 justify-items-center mx-auto">
-        <Navbar />
-        <div id="content">
+      <div className="min-h-screen bg-neutral-content flex flex-col">
+        <Navbar className="flex-1" />
+        <div id="content" className="flex-auto mx-auto">
           <Outlet />
         </div>
       </div >

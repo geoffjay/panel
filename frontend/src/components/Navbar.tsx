@@ -1,13 +1,17 @@
 import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeftIcon, ArrowRightIcon, Bars3Icon } from "@heroicons/react/24/solid";
+import { Bars3Icon } from "@heroicons/react/24/solid";
 import { Cog8ToothIcon, PowerIcon, PuzzlePieceIcon } from "@heroicons/react/24/outline";
 
 import { Quit } from "~wails/runtime";
 
 import { AppContext } from "~root/App";
 
-const Navbar = () => {
+interface NavbarProps {
+  className?: string;
+}
+
+const Navbar = ({ className }: NavbarProps) => {
   const appContext = useContext(AppContext);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const navigate = useNavigate();
@@ -20,7 +24,7 @@ const Navbar = () => {
     setIsDrawerOpen(!isDrawerOpen);
   };
 
-  const handleNavigate = (path) => {
+  const handleNavigate = (path: string) => {
     setIsDrawerOpen(false);
     navigate(path);
   };
@@ -29,17 +33,17 @@ const Navbar = () => {
   const iconColor = appContext.darkMode ? "text-neutral-content" : "text-base-100";
 
   return (
-    <>
-      <div id="navbar" className={`navbar ${themeColor} py-0 px-2 min-h-2 h-12 z-10`}>
+    <div>
+      <div id="navbar" className={`${className} navbar ${themeColor} py-0 px-2 min-h-2 h-12 z-10`}>
         <div className="flex-1">
-          <div className="flex gap-2">
-            <button className="btn btn-sm btn-square btn-ghost">
-              <ArrowLeftIcon className="h-5 w-5" />
-            </button>
-            <button className="btn btn-sm btn-square btn-ghost">
-              <ArrowRightIcon className="h-5 w-5" />
-            </button>
-          </div>
+          {/* <div className="flex gap-2"> */}
+          {/*   <button className={`btn btn-sm btn-square btn-ghost ${iconColor}`}> */}
+          {/*     <ArrowLeftIcon className="h-5 w-5" /> */}
+          {/*   </button> */}
+          {/*   <button className={`btn btn-sm btn-square btn-ghost ${iconColor}`}> */}
+          {/*     <ArrowRightIcon className="h-5 w-5" /> */}
+          {/*   </button> */}
+          {/* </div> */}
         </div>
         <div className="flex-none">
           <div className="drawer drawer-end">
@@ -99,7 +103,7 @@ const Navbar = () => {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 };
 
