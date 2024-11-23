@@ -9,6 +9,7 @@ const MDXComponents = {
   h1: (props: PropType) => <h1 className="text-2xl text-neutral-800 font-bold my-2" {...props} />,
   h2: (props: PropType) => <h2 className="text-xl text-neutral-800 font-bold my-2" {...props} />,
   h3: (props: PropType) => <h3 className="text-lg text-neutral-800 font-bold my-2" {...props} />,
+  p: (props: PropType) => <p className="text-neutral-700" {...props} />,
   code({ className, children, ...props }: { className?: string, children?: React.ReactNode }) {
     const match = /language-(\w+)/.exec(className || "");
     return match ? (
