@@ -9,49 +9,98 @@ interface ExampleContextType {
   title: string;
   value: string;
   description: string;
+  // eslint-disable-next-line no-unused-vars
+  updateTitle?: (title: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  updateValue?: (value: string) => void;
+  // eslint-disable-next-line no-unused-vars
+  updateDescription?: (description: string) => void;
 };
 
 const ExampleContext = createContext<ExampleContextType | null>(null);
 
+const useExampleControls = () => {
+  const exampleContext = useContext(ExampleContext);
+
+  if (!exampleContext) {
+    throw new Error(
+      "useExampleControls has to be used within <ExampleContext.Provider>",
+    );
+  }
+
+  return exampleContext;
+};
+
 const Controls = () => {
+  const exampleContext = useExampleControls();
+  const { title, value, description, updateTitle, updateValue, updateDescription } = exampleContext!;
+
+  if (!updateTitle || !updateValue || !updateDescription) {
+    throw new Error("updateTitle, updateValue and updateDescription are required");
+  }
+
+  const handleTitle = (event: React.FormEvent<HTMLInputElement>) => {
+    updateTitle(event.currentTarget.value);
+  };
+
+  const handleValue = (event: React.FormEvent<HTMLInputElement>) => {
+    updateValue(event.currentTarget.value);
+  };
+
+  const handleDescription = (event: React.FormEvent<HTMLInputElement>) => {
+    updateDescription(event.currentTarget.value);
+  };
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Example.TextInputControl id="input-title" label="Title" value={title} onChange={handleTitle} />
+      <Example.TextInputControl id="input-value" label="Value" value={value} onChange={handleValue} />
+      <Example.TextInputControl id="input-description" label="Description" value={description} onChange={handleDescription} />
+    </div>
+  );
+};
+
+const StatExample: React.FC = () => {
+  const exampleContext = useExampleControls();
+  const { title, value, description } = exampleContext!;
+
+  return (
+    <Example
+      content={<Stat components={MDXComponents} title={title} value={value} description={description} />}
+      controls={<Controls />}
+    />
+  );
+};
+
+const StatExampleWrapper: React.FC = () => {
   const [values, setValues] = useState<ExampleContextType>({
     title: "Stat",
     value: "100",
     description: "Description",
   });
 
-  const handleTitle = (event: React.FormEvent<HTMLInputElement>) => {
-    setValues({ ...values, title: event.currentTarget.value });
+  const handleTitle = (title: string) => {
+    setValues(prev => ({ ...prev, title }));
   };
 
-  const handleValue = (event: React.FormEvent<HTMLInputElement>) => {
-    setValues({ ...values, value: event.currentTarget.value });
+  const handleValue = (value: string) => {
+    setValues(prev => ({ ...prev, value }));
   };
 
-  const handleDescription = (event: React.FormEvent<HTMLInputElement>) => {
-    setValues({ ...values, description: event.currentTarget.value });
+  const handleDescription = (description: string) => {
+    setValues(prev => ({ ...prev, description }));
   };
 
   return (
-    <ExampleContext.Provider value={values}>
-      <div className="flex flex-col gap-4">
-        <Example.TextInputControl key="input-title" label="Title" value={values.title} onChange={handleTitle} />
-        <Example.TextInputControl key="input-value" label="Value" value={values.value} onChange={handleValue} />
-        <Example.TextInputControl key="input-description" label="Description" value={values.description} onChange={handleDescription} />
-      </div>
+    <ExampleContext.Provider value={{
+      ...values,
+      updateTitle: handleTitle,
+      updateValue: handleValue,
+      updateDescription: handleDescription,
+    }}>
+      <StatExample />
     </ExampleContext.Provider>
   );
 };
 
-const StatExample: React.FC = () => {
-  const values = useContext(ExampleContext);
-
-  return (
-    <Example
-      content={<Stat components={MDXComponents} title={values?.title} value={values?.value} description={values?.description} />}
-      controls={<Controls />}
-    />
-  );
-};
-
-export default StatExample;
+export default StatExampleWrapper;

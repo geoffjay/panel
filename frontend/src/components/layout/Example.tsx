@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 
 type ExampleType = React.FC<ExampleProps> & {
   RangeControl: React.FC<RangeControlProps>;
@@ -74,31 +74,26 @@ const SelectControl: React.FC<SelectControlProps> = ({ label, options, value, on
 );
 
 interface TextInputControlProps {
-  key: string;
+  id: string;
   label: string;
   value: string;
   // eslint-disable-next-line no-unused-vars
   onChange: (event: React.FormEvent<HTMLInputElement>) => void;
 }
 
-const TextInputControl: React.FC<TextInputControlProps> = ({ key, label, value, onChange }) => {
-  const [debouncedValue, setDebouncedValue] = useState("");
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      setDebouncedValue(value);
-    }, 500);
-    return () => clearTimeout(timeoutId);
-  }, [value, 500]);
-
-  // const handleChange = (event: React.FormEvent<HTMLInputElement>) => {
-  //   onChange(event);
-  // };
-
+const TextInputControl: React.FC<TextInputControlProps> = ({ id, label, value, onChange }: TextInputControlProps) => {
   return (
     <div className="flex flex-row gap-4">
-      <label className="text-neutral-800 my-auto min-w-[120px]">{label}</label>
-      <input key={key} className="input input-bordered bg-neutral-200 w-full max-w-xs" autoFocus type="text" value={value} onChange={onChange} />
+      <label htmlFor={id} className="text-neutral-800 my-auto min-w-[120px]">
+        {label}
+      </label>
+      <input
+        id={id}
+        className="input input-bordered bg-neutral-200 w-full max-w-xs"
+        type="text"
+        value={value}
+        onChange={onChange}
+      />
     </div>
   );
 };
