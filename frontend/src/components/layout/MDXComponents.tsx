@@ -6,9 +6,10 @@ import { nord } from "react-syntax-highlighter/dist/esm/styles/prism";
 type PropType = JSX.IntrinsicAttributes & React.ClassAttributes<HTMLHeadingElement> & React.HTMLAttributes<HTMLHeadingElement>;
 
 const MDXComponents = {
-  h1: (props: PropType) => <h1 className="text-2xl text-neutral-800 font-bold my-2" {...props} />,
-  h2: (props: PropType) => <h2 className="text-xl text-neutral-800 font-bold my-2" {...props} />,
-  h3: (props: PropType) => <h3 className="text-lg text-neutral-800 font-bold my-2" {...props} />,
+  h1: (props: PropType) => <h1 className="text-2xl text-neutral-700 font-bold my-2" {...props} />,
+  h2: (props: PropType) => <h2 className="text-xl text-neutral-700 font-bold my-2" {...props} />,
+  h3: (props: PropType) => <h3 className="text-lg text-neutral-700 font-bold my-2" {...props} />,
+  h4: (props: PropType) => <h3 className="text-lg text-neutral-600 font-bold my-2" {...props} />,
   p: (props: PropType) => <p className="text-neutral-700" {...props} />,
   code({ className, children, ...props }: { className?: string, children?: React.ReactNode }) {
     const match = /language-(\w+)/.exec(className || "");

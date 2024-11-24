@@ -47,7 +47,7 @@ const Navbar = ({ className }: NavbarProps) => {
         </div>
         <div className="flex-none">
           <div className="drawer drawer-end">
-            <input id="drawer" type="checkbox" checked={isDrawerOpen} className="drawer-toggle" />
+            <input id="drawer" type="checkbox" checked={isDrawerOpen} readOnly className="drawer-toggle" />
             <div className="drawer-content">
               <ul className="menu">
                 <li>

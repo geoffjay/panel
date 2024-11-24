@@ -8,7 +8,7 @@ interface StatProps {
 
 const Stat: React.FC<StatProps> = ({ title, value, description }: StatProps) => {
   return (
-    <div className="stats shadow">
+    <div className="stats shadow bg-neutral-100 text-neutral-700">
       <div className="stat">
         {title ?? <div className="stat-title">{title}</div>}
         <div className="stat-value">{value}</div>

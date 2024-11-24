@@ -16,8 +16,8 @@ const Example: ExampleType = ({ content, controls }: ExampleProps) => (
     <div className="flex-auto py-2 px-4">
       {content}
     </div>
-    <div className="flex-2 border-l border-l-neutral-700 min-w-[480px] py-4 px-4">
-      <h1 className="text-2xl text-neutral-800 font-bold pb-4">Controls</h1>
+    <div className="flex-2 border-l border-l-neutral-700 min-w-[400px] py-4 px-4">
+      <h1 className="text-xl text-neutral-700 font-bold pb-4">Controls</h1>
       {controls}
     </div>
   </div>
@@ -35,7 +35,7 @@ interface RangeControlProps {
 
 const RangeControl: React.FC<RangeControlProps> = ({ id, label, min = 0, max = 100, value, onChange }: RangeControlProps) => (
   <div className="flex flex-row gap-4">
-    <label htmlFor={id} className="text-neutral-800 my-auto min-w-[120px]">{label}</label>
+    <label htmlFor={id} className="text-neutral-700 my-auto min-w-[120px]">{label}</label>
     <input
       id={id}
       className="range bg-neutral-200 w-full max-w-xs"
@@ -64,10 +64,10 @@ interface SelectControlProps {
 
 const SelectControl: React.FC<SelectControlProps> = ({ label, options, value, onChange }) => (
   <div className="flex flex-row gap-4">
-    <label className="text-neutral-800 my-auto min-w-[120px]">{label}</label>
+    <label className="text-neutral-700 my-auto min-w-[120px]">{label}</label>
     <select className="select select-bordered bg-neutral-200 w-full max-w-xs" onChange={onChange} value={value}>
       {options.map((option, i) => (
-        <option selected={option.selected ?? false} key={`option-${option.value}-${i}`} value={option.value}>{option.label}</option>
+        <option key={`option-${option.value}-${i}`} value={option.value}>{option.label}</option>
       ))}
     </select>
   </div>
@@ -84,7 +84,7 @@ interface TextInputControlProps {
 const TextInputControl: React.FC<TextInputControlProps> = ({ id, label, value, onChange }: TextInputControlProps) => {
   return (
     <div className="flex flex-row gap-4">
-      <label htmlFor={id} className="text-neutral-800 my-auto min-w-[120px]">
+      <label htmlFor={id} className="text-neutral-700 my-auto min-w-[120px]">
         {label}
       </label>
       <input

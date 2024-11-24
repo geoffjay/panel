@@ -52,7 +52,7 @@ const Controls = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-2">
       <Example.TextInputControl id="input-title" label="Title" value={title} onChange={handleTitle} />
       <Example.TextInputControl id="input-value" label="Value" value={value} onChange={handleValue} />
       <Example.TextInputControl id="input-description" label="Description" value={description} onChange={handleDescription} />
