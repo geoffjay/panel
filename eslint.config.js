@@ -6,6 +6,7 @@ import { fixupConfigRules } from "@eslint/compat";
 
 export default [
   {
+    env: { browser: true, es6: true, node: true },
     files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
   },
 
@@ -28,6 +29,6 @@ export default [
   },
 
   {
-    ignores: ["**/*.d.ts", "**/*.config.cjs", "**/dist/", "**/wailsjs/"],
+    ignores: ["**/*.d.ts", "**/*.config.cjs", "**/dist/", "**/src-tauri/"],
   },
 ];

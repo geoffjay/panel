@@ -23,8 +23,7 @@
       "~root/*": ["./src/*"],
       "~components": ["./src/components"],
       "~components/*": ["./src/components/*"],
-      "~features/*": ["./src/features/*"],
-      "~wails/*": ["./wailsjs/*"]
+      "~features/*": ["./src/features/*"]
     }
   },
   "include": ["src"],
