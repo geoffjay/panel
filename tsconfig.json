@@ -44,6 +44,12 @@
       "~features/*": [
         "./src/features/*"
       ],
+      "~lib": [
+        "./src/lib"
+      ],
+      "~lib/*": [
+        "./src/lib/*"
+      ],
       "@/*": [
         "./src/*"
       ]
