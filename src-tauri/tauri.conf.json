@@ -12,9 +12,8 @@
   "app": {
     "windows": [
       {
-        "title": "panel-ng",
-        "width": 800,
-        "height": 600
+        "title": "Panel",
+        "maximized": true
       }
     ],
     "security": {

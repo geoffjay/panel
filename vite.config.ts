@@ -9,9 +9,11 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig({
   resolve: {
     alias: {
+      "~": fileURLToPath(new URL("./src", import.meta.url)),
       "~root": fileURLToPath(new URL("./src", import.meta.url)),
       "~components": fileURLToPath(new URL("./src/components", import.meta.url)),
       "~features": fileURLToPath(new URL("./src/features", import.meta.url)),
+      "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   plugins: [

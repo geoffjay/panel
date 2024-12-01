@@ -4,7 +4,36 @@
     "skipLibCheck": true,
     "module": "ESNext",
     "moduleResolution": "bundler",
-    "allowSyntheticDefaultImports": true
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "~/*": [
+        "./src/*"
+      ],
+      "~root": [
+        "./src"
+      ],
+      "~root/*": [
+        "./src/*"
+      ],
+      "~components": [
+        "./src/components"
+      ],
+      "~components/*": [
+        "./src/components/*"
+      ],
+      "~features": [
+        "./src/features"
+      ],
+      "~features/*": [
+        "./src/features/*"
+      ],
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
-  "include": ["vite.config.ts"]
+  "include": [
+    "vite.config.ts"
+  ]
 }
