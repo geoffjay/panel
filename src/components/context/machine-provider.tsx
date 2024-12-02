@@ -3,8 +3,9 @@ import { createMachine, state, transition } from "robot3";
 import { useMachine } from "react-robot";
 
 export const EVENTS = {
-  START_LOADING: "START_LOADING",
-  COMPLETE_LOADING: "COMPLETE_LOADING"
+  LOADING_STARTED: "LOADING_STARTED",
+  LOADING_PROGRESS: "LOADING_PROGRESS",
+  LOADING_FINISHED: "LOADING_FINISHED"
 } as const;
 
 export const STATES = {
@@ -16,12 +17,13 @@ export const STATES = {
 type MachineState = (typeof STATES)[keyof typeof STATES];
 
 type MachineEvent = 
-  | { type: typeof EVENTS.START_LOADING }
-  | { type: typeof EVENTS.COMPLETE_LOADING };
+  | { type: typeof EVENTS.LOADING_STARTED }
+  | { type: typeof EVENTS.LOADING_PROGRESS }
+  | { type: typeof EVENTS.LOADING_FINISHED };
 
 const appMachine = createMachine({
-  [STATES.LAUNCHED]: state(transition(EVENTS.START_LOADING, STATES.LOADING)),
-  [STATES.LOADING]: state(transition(EVENTS.COMPLETE_LOADING, STATES.READY)),
+  [STATES.LAUNCHED]: state(transition(EVENTS.LOADING_STARTED, STATES.LOADING)),
+  [STATES.LOADING]: state(transition(EVENTS.LOADING_FINISHED, STATES.READY)),
   [STATES.READY]: state()
 });
 

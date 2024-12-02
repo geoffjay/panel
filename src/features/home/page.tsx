@@ -8,13 +8,13 @@ import { useMachineContext, EVENTS, STATES } from "~components/context/machine-p
 
 type AppEvent =
   | {
-      event: "loading-started";
+      event: "loadingStarted";
       data: {
         id: number;
       };
     }
   | {
-      event: "loading-progress";
+      event: "loadingProgress";
       data: {
         id: number;
         percent: number;
@@ -22,7 +22,7 @@ type AppEvent =
       };
     }
   | {
-      event: "loading-finished";
+      event: "loadingFinished";
       data: {
         id: number;
       };
@@ -35,13 +35,24 @@ const Page: React.FC = () => {
 
   onEvent.onmessage = (message) => {
     console.log(`got app event ${message.event}`);
+
+    switch (message.event) {
+      case "loadingStarted":
+        send({ type: EVENTS.LOADING_STARTED, data: message.data });
+        break;
+      case "loadingProgress":
+        send({ type: EVENTS.LOADING_PROGRESS, data: message.data });
+        break;
+      case "loadingFinished":
+        send({ type: EVENTS.LOADING_FINISHED, data: message.data });
+        break;
+    }
   };
 
   const isLoading = current.name === STATES.LOADING;
 
-  const handleStartLoading = async () => {
+  const handleInitialize = async () => {
     await invoke("initialize", { onEvent });
-    send({ type: EVENTS.START_LOADING });
   };
 
   return (
@@ -49,7 +60,7 @@ const Page: React.FC = () => {
       <p>Current state: {current.name}</p>
       
       {current.name === "launched" && (
-        <Button onClick={handleStartLoading}>Start Loading</Button>
+        <Button onClick={handleInitialize}>Initialize</Button>
       )}
       
       {isLoading && <p>Loading...</p>}
