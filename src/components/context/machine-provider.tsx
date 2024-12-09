@@ -5,17 +5,19 @@ import { useMachine } from "react-robot";
 export const EVENTS = {
   LOADING_STARTED: "LOADING_STARTED",
   LOADING_PROGRESS: "LOADING_PROGRESS",
-  LOADING_FINISHED: "LOADING_FINISHED"
+  LOADING_FINISHED: "LOADING_FINISHED",
 } as const;
 
 export const STATES = {
   LAUNCHED: "launched",
   LOADING: "loading",
-  READY: "ready"
+  READY: "ready",
 } as const;
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type MachineState = (typeof STATES)[keyof typeof STATES];
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 type MachineEvent = 
   | { type: typeof EVENTS.LOADING_STARTED }
   | { type: typeof EVENTS.LOADING_PROGRESS }
@@ -24,7 +26,7 @@ type MachineEvent =
 const appMachine = createMachine({
   [STATES.LAUNCHED]: state(transition(EVENTS.LOADING_STARTED, STATES.LOADING)),
   [STATES.LOADING]: state(transition(EVENTS.LOADING_FINISHED, STATES.READY)),
-  [STATES.READY]: state()
+  [STATES.READY]: state(),
 });
 
 type MachineTuple = ReturnType<typeof useMachine<typeof appMachine>>;

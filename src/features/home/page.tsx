@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { invoke, Channel } from "@tauri-apps/api/core";
 
-import { Layout } from "~components";
+import { Layout, UserTable } from "~components";
+import { User, columns as userColumns } from "~components/user-table";
 import { Button } from "~components/ui/button";
 import { useMachineContext, EVENTS, STATES } from "~components/context/machine-provider";
+import { useUsers } from "~lib/hooks";
 
 type AppEvent =
   | {
@@ -29,7 +31,9 @@ type AppEvent =
     };
 
 const Page: React.FC = () => {
+  const [users, setUsers] = useState<User[]>([]);
   const [current, send] = useMachineContext();
+  const { users: getUsers, error: userError } = useUsers();
 
   const onEvent = new Channel<AppEvent>();
 
@@ -51,6 +55,19 @@ const Page: React.FC = () => {
 
   const isLoading = current.name === STATES.LOADING;
 
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const fetchedUsers = await getUsers();
+      if(fetchedUsers) {
+        setUsers(fetchedUsers);
+      }
+    };
+
+    if(current.name === "ready") {
+      fetchUsers();
+    }
+  }, [current]);
+
   const handleInitialize = async () => {
     await invoke("initialize", { onEvent });
   };
@@ -58,16 +75,18 @@ const Page: React.FC = () => {
   return (
     <Layout>
       <p>Current state: {current.name}</p>
-      
+
       {current.name === "launched" && (
         <Button onClick={handleInitialize}>Initialize</Button>
       )}
-      
+
       {isLoading && <p>Loading...</p>}
-      
-      {current.name === "ready" && <p>Ready!</p>}
+
+      {(current.name === "ready" && users) &&
+        <UserTable columns={userColumns} data={users} />
+      }
     </Layout>
   );
-}
+};
 
 export default Page;

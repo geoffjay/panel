@@ -8,6 +8,7 @@ import { Page as Error } from "~features/error";
 import { Page as Documentation } from "~features/documentation";
 
 import { MachineProvider } from "~components/context/machine-provider";
+import { DatabaseProvider } from "~components/context/database-provider";
 
 import "./style.css";
 
@@ -36,8 +37,10 @@ const root = createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <MachineProvider>
-      <RouterProvider router={router} />
-    </MachineProvider>
+    <DatabaseProvider>
+      <MachineProvider>
+        <RouterProvider router={router} />
+      </MachineProvider>
+    </DatabaseProvider>
   </React.StrictMode>,
 );
