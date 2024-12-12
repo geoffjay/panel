@@ -1,5 +1,8 @@
+mod server;
+
 use serde::Serialize;
 use std::fmt;
+use std::thread;
 use tauri::{ipc::Channel, AppHandle};
 use tauri_plugin_sql::{Migration, MigrationKind};
 
@@ -64,6 +67,18 @@ pub fn run() {
     ];
 
     tauri::Builder::default()
+        .setup(|app| {
+            #[cfg(desktop)]
+            {
+                let app_handle = app.handle().clone();
+
+                thread::spawn(|| {
+                    server::init(app_handle).unwrap();
+                });
+            }
+
+            Ok(())
+        })
         .plugin(tauri_plugin_log::Builder::new().build())
         .plugin(
             tauri_plugin_sql::Builder::default()

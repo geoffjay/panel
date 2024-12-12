@@ -2,13 +2,15 @@ import React from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter } from "react-router";
 import { RouterProvider } from "react-router/dom";
+import { Provider as ReduxProvider } from "react-redux";
 
 import { Page as Home } from "~features/home";
 import { Page as Error } from "~features/error";
 import { Page as Documentation } from "~features/documentation";
 
 import { MachineProvider } from "~components/context/machine-provider";
-import { DatabaseProvider } from "~components/context/database-provider";
+
+import { store } from "~lib/store";
 
 import "./style.css";
 
@@ -37,10 +39,10 @@ const root = createRoot(container!);
 
 root.render(
   <React.StrictMode>
-    <DatabaseProvider>
+    <ReduxProvider store={store}>
       <MachineProvider>
         <RouterProvider router={router} />
       </MachineProvider>
-    </DatabaseProvider>
+    </ReduxProvider>
   </React.StrictMode>,
 );
