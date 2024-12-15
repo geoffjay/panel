@@ -1,10 +1,18 @@
+mod db;
+mod models;
+mod schema;
 mod server;
 
+use diesel::SqliteConnection;
+use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};
 use serde::Serialize;
 use std::fmt;
 use std::thread;
 use tauri::{ipc::Channel, AppHandle};
-use tauri_plugin_sql::{Migration, MigrationKind};
+
+use crate::db::establish_connection;
+
+pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase", tag = "event", content = "data")]
@@ -56,35 +64,23 @@ fn initialize(_app: AppHandle, on_event: Channel<AppEvent>) {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
-    let migrations = vec![
-        // Define your migrations here
-        Migration {
-            version: 1,
-            description: "create_initial_tables",
-            sql: "CREATE TABLE users (id INTEGER PRIMARY KEY, name TEXT);",
-            kind: MigrationKind::Up,
-        },
-    ];
-
     tauri::Builder::default()
         .setup(|app| {
             #[cfg(desktop)]
             {
+                let mut connection: SqliteConnection = establish_connection(app.handle().clone());
+                connection.run_pending_migrations(MIGRATIONS).unwrap();
+
                 let app_handle = app.handle().clone();
 
                 thread::spawn(|| {
-                    server::init(app_handle).unwrap();
+                    server::init(app_handle, connection).unwrap();
                 });
             }
 
             Ok(())
         })
         .plugin(tauri_plugin_log::Builder::new().build())
-        .plugin(
-            tauri_plugin_sql::Builder::default()
-                .add_migrations("sqlite:panel.db", migrations)
-                .build(),
-        )
         .plugin(tauri_plugin_shell::init())
         .invoke_handler(tauri::generate_handler![initialize])
         .run(tauri::generate_context!())

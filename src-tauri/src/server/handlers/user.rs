@@ -6,7 +6,6 @@ use serde::{Deserialize, Serialize};
 
 use crate::server::state::AppState;
 
-// the input to our `create_user` handler
 #[derive(Deserialize)]
 pub struct CreateUser {
     pub username: String,
@@ -25,29 +24,11 @@ pub struct DeleteUser {
     pub id: u64,
 }
 
-// the output from our `create_user` handler
 #[derive(Serialize)]
 pub struct User {
     pub id: u64,
     pub username: String,
     pub email: String,
-}
-
-pub async fn root() -> (StatusCode, Json<&'static str>) {
-    (StatusCode::OK, Json("Hello, world!"))
-}
-
-pub async fn create_user(
-    State(_state): State<Arc<AppState>>,
-    Json(payload): Json<CreateUser>,
-) -> (StatusCode, Json<User>) {
-    let user = User {
-        id: 1337,
-        username: payload.username,
-        email: payload.email,
-    };
-
-    (StatusCode::CREATED, Json(user))
 }
 
 pub async fn read_users() -> (StatusCode, Json<Vec<User>>) {
@@ -71,6 +52,19 @@ pub async fn read_user(params: Query<HashMap<String, String>>) -> (StatusCode, J
     (StatusCode::OK, Json(user))
 }
 
+pub async fn create_user(
+    State(_state): State<Arc<AppState>>,
+    Json(payload): Json<CreateUser>,
+) -> (StatusCode, Json<User>) {
+    let user = User {
+        id: 1337,
+        username: payload.username,
+        email: payload.email,
+    };
+
+    (StatusCode::CREATED, Json(user))
+}
+
 pub async fn update_user(
     State(_state): State<Arc<AppState>>,
     Json(payload): Json<UpdateUser>,
@@ -88,6 +82,5 @@ pub async fn delete_user(
     State(_state): State<Arc<AppState>>,
     Json(payload): Json<DeleteUser>,
 ) -> (StatusCode, Json<&'static str>) {
-    // implement deletion logic here
     (StatusCode::OK, Json("User deleted successfully"))
 }
