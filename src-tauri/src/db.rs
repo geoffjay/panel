@@ -3,6 +3,12 @@ use tauri::{AppHandle, Manager, path::BaseDirectory};
 
 use crate::models::{Dashboard, NewDashboard};
 
+/// Establish a connection to the database
+/// 
+/// This function is used to establish a connection to the database.
+/// It uses the `app` handle to get the path to the database file.
+/// The database file is located in the `AppLocalData` directory.
+/// The database file is named `panel.db`.
 pub fn establish_connection(app: AppHandle) -> SqliteConnection {
     let database_url = app
         .path()
@@ -13,18 +19,11 @@ pub fn establish_connection(app: AppHandle) -> SqliteConnection {
         .unwrap_or_else(|_| panic!("Error connecting to {}", database_url.to_string_lossy()))
 }
 
-pub fn establish_test_connection() -> SqliteConnection {
-    let database_url = "sqlite://test.db".to_string();
-
-    SqliteConnection::establish(&database_url)
-        .unwrap_or_else(|_| panic!("Error connecting to {}", database_url))
-}
-
-pub fn get_dashboard(connection: &mut SqliteConnection, id: i32) -> Dashboard {
+pub fn get_dashboard(connection: &mut SqliteConnection, dashboard_id: i32) -> Dashboard {
     use crate::schema::dashboards::dsl::*;
 
     dashboards
-        .find(id)
+        .find(dashboard_id)
         .first(connection)
         .unwrap()
 }
@@ -58,10 +57,10 @@ pub fn update_dashboard(connection: &mut SqliteConnection, dashboard: Dashboard)
         .expect("Error updating dashboard")
 }
 
-pub fn delete_dashboard(connection: &mut SqliteConnection, id: i32) {
+pub fn delete_dashboard(connection: &mut SqliteConnection, dashboard_id: i32) {
     use crate::schema::dashboards::dsl::*;
 
-    diesel::delete(dashboards.find(id)).execute(connection).unwrap();
+    diesel::delete(dashboards.find(dashboard_id)).execute(connection).unwrap();
 }
 
 #[cfg(test)]
@@ -69,7 +68,6 @@ mod tests {
     use super::*;
     use diesel_migrations::MigrationHarness;
 
-    use crate::db::establish_test_connection;
     use crate::MIGRATIONS;
 
     struct TestContext {
@@ -77,7 +75,10 @@ mod tests {
     }
 
     fn setup_test_environment() -> TestContext {
-        let mut connection: SqliteConnection = establish_test_connection();
+        let database_url = ":memory:".to_string();
+        let mut connection = SqliteConnection::establish(&database_url)
+            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+
         connection.run_pending_migrations(MIGRATIONS).unwrap();
 
         TestContext { connection }

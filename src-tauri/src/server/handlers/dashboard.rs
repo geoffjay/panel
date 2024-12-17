@@ -1,11 +1,17 @@
 use axum::{response::Json, http::StatusCode};
 use axum::extract::{State, Path};
-use diesel::prelude::*;
 use serde::Deserialize;
 use std::sync::Arc;
 
 use crate::server::state::AppState;
-use crate::models::Dashboard;
+use crate::models::{Dashboard, NewDashboard};
+use crate::db::{
+    get_dashboard,
+    get_dashboards,
+    create_dashboard as create_dashboard_db,
+    update_dashboard as update_dashboard_db,
+    delete_dashboard as delete_dashboard_db
+};
 
 #[derive(Deserialize)]
 pub struct CreateDashboard {
@@ -25,56 +31,67 @@ pub struct DeleteDashboard {
     pub id: i32,
 }
 
-#[axum::debug_handler]
 pub async fn read_dashboard(
     Path(dashboard_id): Path<i32>,
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Dashboard>) {
-    use crate::schema::dashboards::dsl::*;
-
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    let dashboard: Dashboard = dashboards
-        .find(dashboard_id)
-        .first(db)
-        .expect("Error loading dashboard");
+    let dashboard = get_dashboard(db, dashboard_id);
 
     (
         StatusCode::OK,
-        Json(Dashboard {
-            id: dashboard.id,
-            title: dashboard.title,
-            description: dashboard.description,
-        })
+        Json(dashboard)
     )
 }
 
-pub async fn read_dashboards() -> (StatusCode, Json<Vec<Dashboard>>) {
-    (StatusCode::OK, Json(vec![
-        Dashboard { id: 1, title: "title".to_string(), description: "description".to_string() },
-        Dashboard { id: 2, title: "title".to_string(), description: "description".to_string() },
-        Dashboard { id: 3, title: "title".to_string(), description: "description".to_string() },
-    ]))
+#[axum::debug_handler]
+pub async fn read_dashboards(
+    State(state): State<Arc<AppState>>,
+) -> (StatusCode, Json<Vec<Dashboard>>) {
+    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let dashboards = get_dashboards(db);
+
+    (StatusCode::OK, Json(dashboards))
 }
 
 pub async fn create_dashboard(
-    State(_state): State<Arc<AppState>>,
+    State(state): State<Arc<AppState>>,
     Json(payload): Json<CreateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
-    (StatusCode::CREATED, Json(Dashboard { id: 1, title: payload.title, description: payload.description }))
+    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let dashboard = create_dashboard_db(
+        db,
+        NewDashboard { title: payload.title, description: payload.description }
+    );
+
+    (StatusCode::CREATED, Json(dashboard))
 }
 
 pub async fn update_dashboard(
-    State(_state): State<Arc<AppState>>,
+    State(state): State<Arc<AppState>>,
     Json(payload): Json<UpdateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
-    (StatusCode::OK, Json(Dashboard { id: payload.id, title: payload.title.unwrap(), description: payload.description.unwrap() }))
+    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let dashboard = update_dashboard_db(
+        db,
+        Dashboard {
+            id: payload.id,
+            title: payload.title.unwrap(),
+            description: payload.description.unwrap()
+        }
+    );
+
+    (StatusCode::OK, Json(dashboard))
 }
 
 pub async fn delete_dashboard(
-    State(_state): State<Arc<AppState>>,
+    State(state): State<Arc<AppState>>,
     Path(id): Path<i32>,
-) -> (StatusCode, Json<Dashboard>) {
-    (StatusCode::OK, Json(Dashboard { id, title: "title".to_string(), description: "description".to_string() }))
+) -> StatusCode {
+    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    delete_dashboard_db(db, id);
+
+    StatusCode::OK
 }
 
 #[cfg(test)]
@@ -84,52 +101,93 @@ mod tests {
     use axum::Router;
     use axum::routing::{get, post, put, delete};
     use axum_test::TestServer;
-    use diesel::SqliteConnection;
+    use diesel::prelude::*;
     use diesel_migrations::MigrationHarness;
     use serde_json::json;
 
-    use crate::db::establish_test_connection;
+    use crate::models::NewDashboard;
+    use crate::db::create_dashboard as create_dashboard_db;
     use crate::MIGRATIONS;
 
     struct TestContext {
-        connection: SqliteConnection,
+        db: Arc<Mutex<SqliteConnection>>,
     }
 
     fn setup_test_environment() -> TestContext {
-        let mut connection: SqliteConnection = establish_test_connection();
+        let database_url = ":memory:".to_string();
+        let mut connection = SqliteConnection::establish(&database_url)
+            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
+
         connection.run_pending_migrations(MIGRATIONS).unwrap();
 
-        TestContext { connection }
+        TestContext { db: Arc::new(Mutex::new(connection)) }
     }
 
     #[tokio::test]
     async fn test_read_dashboard() {
         let context = setup_test_environment();
-        let state = Arc::new(AppState{ tauri: None, db: Some(Mutex::new(context.connection)) });
+        let state = Arc::new(
+            AppState{
+                tauri: None,
+                db: Some(context.db.clone())
+            }
+        );
         let app = Router::new()
             .route(&"/dashboard/:id", get(read_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
+        let dashboard = create_dashboard_db(
+            &mut *context.db.lock().unwrap(),
+            NewDashboard {
+                title: "title".to_string(),
+                description: "description".to_string()
+            }
+        );
+
         let response = server
-            .get("/dashboard/1")
+            .get(&format!("/dashboard/{}", dashboard.id))
             .await;
 
         response.assert_status_ok();
         response.assert_json_contains(&json!({
-            "id": 1,
-            "title": "title",
-            "description": "description"
+            "id": dashboard.id,
+            "title": dashboard.title,
+            "description": dashboard.description
         }));
     }
 
     #[tokio::test]
     async fn test_read_dashboards() {
+        let context = setup_test_environment();
+        let state = Arc::new(
+            AppState{
+                tauri: None,
+                db: Some(context.db.clone())
+            }
+        );
         let app = Router::new()
-            .route(&"/dashboard", get(read_dashboards));
+            .route(&"/dashboard", get(read_dashboards))
+            .with_state(state);
 
         let server = TestServer::new(app).unwrap();
+
+        create_dashboard_db(
+            &mut *context.db.lock().unwrap(),
+            NewDashboard {
+                title: "title 1".to_string(),
+                description: "description 1".to_string()
+            }
+        );
+
+        create_dashboard_db(
+            &mut *context.db.lock().unwrap(),
+            NewDashboard {
+                title: "title 2".to_string(),
+                description: "description 2".to_string()
+            }
+        );
 
         let response = server
             .get("/dashboard")
@@ -137,15 +195,20 @@ mod tests {
 
         response.assert_status_ok();
         response.assert_json_contains(&json!([
-            { "id": 1, "title": "title", "description": "description" },
-            { "id": 2, "title": "title", "description": "description" },
-            { "id": 3, "title": "title", "description": "description" },
+            { "id": 1, "title": "title 1", "description": "description 1" },
+            { "id": 2, "title": "title 2", "description": "description 2" },
         ]));
     }
 
     #[tokio::test]
     async fn test_create_dashboard() {
-        let state = Arc::new(AppState{ tauri: None, db: None });
+        let context = setup_test_environment();
+        let state = Arc::new(
+            AppState{
+                tauri: None,
+                db: Some(context.db.clone()),
+            }
+        );
         let app = Router::new()
             .route(&"/dashboard", post(create_dashboard))
             .with_state(state);
@@ -170,48 +233,74 @@ mod tests {
 
     #[tokio::test]
     async fn test_update_dashboard() {
-        let state = Arc::new(AppState{ tauri: None, db: None });
+        let context = setup_test_environment();
+        let state = Arc::new(
+            AppState{
+                tauri: None,
+                db: Some(context.db.clone())
+            }
+        );
         let app = Router::new()
             .route(&"/dashboard", put(update_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
+        let dashboard = create_dashboard_db(
+            &mut *context.db.lock().unwrap(),
+            NewDashboard {
+                title: "title 1".to_string(),
+                description: "description 1".to_string()
+            }
+        );
+
         let response = server
             .put("/dashboard")
             .json(&json!({
-                "id": 1,
-                "title": "title",
-                "description": "description"
+                "id": dashboard.id,
+                "title": "title 2",
+                "description": "description 2"
             }))
             .await;
 
         response.assert_status_ok();
         response.assert_json_contains(&json!({
-            "id": 1,
-            "title": "title",
-            "description": "description"
+            "id": dashboard.id,
+            "title": "title 2",
+            "description": "description 2"
         }));
     }
 
     #[tokio::test]
     async fn test_delete_dashboard() {
-        let state = Arc::new(AppState{ tauri: None, db: None });
+        let context = setup_test_environment();
+        let state = Arc::new(
+            AppState{
+                tauri: None,
+                db: Some(context.db.clone())
+            }
+        );
         let app = Router::new()
             .route(&"/dashboard/:id", delete(delete_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
+        let dashboard = create_dashboard_db(
+            &mut *context.db.lock().unwrap(),
+            NewDashboard {
+                title: "title 1".to_string(),
+                description: "description 1".to_string()
+            }
+        );
+
         let response = server
-            .delete("/dashboard/1")
+            .delete(&format!("/dashboard/{}", dashboard.id))
             .await;
 
         response.assert_status_ok();
-        response.assert_json_contains(&json!({
-            "id": 1,
-            "title": "title",
-            "description": "description"
-        }));
+
+        let dashboards = get_dashboards(&mut *context.db.lock().unwrap());
+        assert_eq!(dashboards.len(), 0);
     }
 }

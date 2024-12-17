@@ -19,7 +19,7 @@ pub async fn init(tauri: AppHandle, db: SqliteConnection) -> io::Result<()> {
     let shared_state = Arc::new(
         AppState {
             tauri: Some(tauri),
-            db: Some(Mutex::new(db)),
+            db: Some(Mutex::new(db).into()),
         },
     );
     let cors_layer = CorsLayer::new()
