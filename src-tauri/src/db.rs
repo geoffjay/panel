@@ -100,4 +100,72 @@ mod tests {
         assert_eq!(dashboard.title, found_dashboard.title);
         assert_eq!(dashboard.description, found_dashboard.description);
     }
+
+    #[test]
+    fn test_get_dashboards() {
+        let mut context = setup_test_environment();
+        let dashboards = get_dashboards(&mut context.connection);
+
+        assert_eq!(dashboards.len(), 0);
+
+        create_dashboard(
+            &mut context.connection,
+            NewDashboard {
+                title: "title 1".to_string(),
+                description: "description 1".to_string()
+            }
+        );
+
+        create_dashboard(
+            &mut context.connection,
+            NewDashboard {
+                title: "title 2".to_string(),
+                description: "description 2".to_string()
+            }
+        );
+
+        let dashboards = get_dashboards(&mut context.connection);
+        assert_eq!(dashboards.len(), 2);
+    }
+
+    #[test]
+    fn test_update_dashboard() {
+        let mut context = setup_test_environment();
+        let dashboard = create_dashboard(
+            &mut context.connection,
+            NewDashboard {
+                title: "title".to_string(),
+                description: "description".to_string()
+            }
+        );
+
+        let updated_dashboard = update_dashboard(
+            &mut context.connection,
+            Dashboard {
+                id: dashboard.id,
+                title: "title 2".to_string(),
+                description: "description 2".to_string()
+            }
+        );
+
+        assert_eq!(updated_dashboard.id, dashboard.id);
+        assert_eq!(updated_dashboard.title, "title 2");
+        assert_eq!(updated_dashboard.description, "description 2");
+    }
+
+    #[test]
+    fn test_delete_dashboard() {
+        let mut context = setup_test_environment();
+        let dashboard = create_dashboard(
+            &mut context.connection,
+            NewDashboard {
+                title: "title".to_string(),
+                description: "description".to_string()
+            }
+        );
+
+        delete_dashboard(&mut context.connection, dashboard.id);
+        let dashboards = get_dashboards(&mut context.connection);
+        assert_eq!(dashboards.len(), 0);
+    }
 }

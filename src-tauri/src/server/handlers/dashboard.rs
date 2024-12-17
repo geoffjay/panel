@@ -44,7 +44,6 @@ pub async fn read_dashboard(
     )
 }
 
-#[axum::debug_handler]
 pub async fn read_dashboards(
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Vec<Dashboard>>) {
