@@ -1,0 +1,25 @@
+[tasks.js-format]
+command = "bun"
+args = ["run", "format"]
+
+[tasks.rs-format]
+install_crate = "rustfmt"
+command = "cargo"
+args = ["fmt", "--manifest-path=./src-tauri/Cargo.toml", "--", "--emit=files"]
+
+[tasks.format]
+dependencies = ["js-format", "rs-format"]
+
+[tasks.clean]
+cwd = "src-tauri"
+command = "cargo"
+args = ["clean"]
+
+[tasks.build]
+command = "bun"
+args = ["run", "tauri", "build"]
+dependencies = ["clean"]
+
+[tasks.changelog]
+command = "git"
+args = ["cliff", "-o", "CHANGELOG.md"]

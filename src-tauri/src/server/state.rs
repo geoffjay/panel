@@ -1,6 +1,6 @@
+use diesel::SqliteConnection;
 use std::sync::{Arc, Mutex};
 use tauri::AppHandle;
-use diesel::SqliteConnection;
 pub struct AppState {
     pub tauri: Option<AppHandle>,
     pub db: Option<Arc<Mutex<SqliteConnection>>>,

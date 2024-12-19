@@ -1,8 +1,8 @@
-use std::sync::Arc;
-use std::collections::HashMap;
-use axum::{response::Json, http::StatusCode};
-use axum::extract::{State, Query};
+use axum::extract::{Query, State};
+use axum::{http::StatusCode, response::Json};
 use serde::{Deserialize, Serialize};
+use std::collections::HashMap;
+use std::sync::Arc;
 
 use crate::server::state::AppState;
 
@@ -33,9 +33,21 @@ pub struct User {
 
 pub async fn read_users() -> (StatusCode, Json<Vec<User>>) {
     let users = vec![
-        User { id: 1, username: "user1".to_string(), email: "user1@example.com".to_string() },
-        User { id: 2, username: "user2".to_string(), email: "user2@example.com".to_string() },
-        User { id: 3, username: "user3".to_string(), email: "user3@example.com".to_string() },
+        User {
+            id: 1,
+            username: "user1".to_string(),
+            email: "user1@example.com".to_string(),
+        },
+        User {
+            id: 2,
+            username: "user2".to_string(),
+            email: "user2@example.com".to_string(),
+        },
+        User {
+            id: 3,
+            username: "user3".to_string(),
+            email: "user3@example.com".to_string(),
+        },
     ];
 
     (StatusCode::OK, Json(users))

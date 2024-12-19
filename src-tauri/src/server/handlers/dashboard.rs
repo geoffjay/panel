@@ -1,11 +1,11 @@
-use axum::{response::Json, http::StatusCode};
-use axum::extract::{State, Path};
+use axum::extract::{Path, State};
+use axum::{http::StatusCode, response::Json};
 use serde::Deserialize;
 use std::sync::Arc;
 
-use crate::server::state::AppState;
 use crate::db::models::{Dashboard, NewDashboard};
 use crate::db::repositories::dashboard as repository;
+use crate::server::state::AppState;
 
 #[derive(Deserialize)]
 pub struct CreateDashboard {
@@ -32,10 +32,7 @@ pub async fn read_dashboard(
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
     let dashboard = repository::get_dashboard(db, id);
 
-    (
-        StatusCode::OK,
-        Json(dashboard)
-    )
+    (StatusCode::OK, Json(dashboard))
 }
 
 pub async fn read_dashboards(
@@ -54,7 +51,10 @@ pub async fn create_dashboard(
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
     let dashboard = repository::create_dashboard(
         db,
-        NewDashboard { title: payload.title, description: payload.description }
+        NewDashboard {
+            title: payload.title,
+            description: payload.description,
+        },
     );
 
     (StatusCode::CREATED, Json(dashboard))
@@ -70,8 +70,8 @@ pub async fn update_dashboard(
         Dashboard {
             id: payload.id,
             title: payload.title.unwrap(),
-            description: payload.description.unwrap()
-        }
+            description: payload.description.unwrap(),
+        },
     );
 
     (StatusCode::OK, Json(dashboard))
@@ -90,13 +90,13 @@ pub async fn delete_dashboard(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::sync::Mutex;
+    use axum::routing::{delete, get, post, put};
     use axum::Router;
-    use axum::routing::{get, post, put, delete};
     use axum_test::TestServer;
     use diesel::prelude::*;
     use diesel_migrations::MigrationHarness;
     use serde_json::json;
+    use std::sync::Mutex;
 
     use crate::MIGRATIONS;
 
@@ -111,18 +111,18 @@ mod tests {
 
         connection.run_pending_migrations(MIGRATIONS).unwrap();
 
-        TestContext { db: Arc::new(Mutex::new(connection)) }
+        TestContext {
+            db: Arc::new(Mutex::new(connection)),
+        }
     }
 
     #[tokio::test]
     async fn test_read_dashboard() {
         let context = setup_test_environment();
-        let state = Arc::new(
-            AppState{
-                tauri: None,
-                db: Some(context.db.clone())
-            }
-        );
+        let state = Arc::new(AppState {
+            tauri: None,
+            db: Some(context.db.clone()),
+        });
         let app = Router::new()
             .route(&"/dashboard/:id", get(read_dashboard))
             .with_state(state);
@@ -133,13 +133,11 @@ mod tests {
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title".to_string(),
-                description: "description".to_string()
-            }
+                description: "description".to_string(),
+            },
         );
 
-        let response = server
-            .get(&format!("/dashboard/{}", dashboard.id))
-            .await;
+        let response = server.get(&format!("/dashboard/{}", dashboard.id)).await;
 
         response.assert_status_ok();
         response.assert_json_contains(&json!({
@@ -152,12 +150,10 @@ mod tests {
     #[tokio::test]
     async fn test_read_dashboards() {
         let context = setup_test_environment();
-        let state = Arc::new(
-            AppState{
-                tauri: None,
-                db: Some(context.db.clone())
-            }
-        );
+        let state = Arc::new(AppState {
+            tauri: None,
+            db: Some(context.db.clone()),
+        });
         let app = Router::new()
             .route(&"/dashboard", get(read_dashboards))
             .with_state(state);
@@ -168,21 +164,19 @@ mod tests {
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
-                description: "description 1".to_string()
-            }
+                description: "description 1".to_string(),
+            },
         );
 
         repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 2".to_string(),
-                description: "description 2".to_string()
-            }
+                description: "description 2".to_string(),
+            },
         );
 
-        let response = server
-            .get("/dashboard")
-            .await;
+        let response = server.get("/dashboard").await;
 
         response.assert_status_ok();
         response.assert_json_contains(&json!([
@@ -194,12 +188,10 @@ mod tests {
     #[tokio::test]
     async fn test_create_dashboard() {
         let context = setup_test_environment();
-        let state = Arc::new(
-            AppState{
-                tauri: None,
-                db: Some(context.db.clone()),
-            }
-        );
+        let state = Arc::new(AppState {
+            tauri: None,
+            db: Some(context.db.clone()),
+        });
         let app = Router::new()
             .route(&"/dashboard", post(create_dashboard))
             .with_state(state);
@@ -225,12 +217,10 @@ mod tests {
     #[tokio::test]
     async fn test_update_dashboard() {
         let context = setup_test_environment();
-        let state = Arc::new(
-            AppState{
-                tauri: None,
-                db: Some(context.db.clone())
-            }
-        );
+        let state = Arc::new(AppState {
+            tauri: None,
+            db: Some(context.db.clone()),
+        });
         let app = Router::new()
             .route(&"/dashboard", put(update_dashboard))
             .with_state(state);
@@ -241,8 +231,8 @@ mod tests {
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
-                description: "description 1".to_string()
-            }
+                description: "description 1".to_string(),
+            },
         );
 
         let response = server
@@ -265,12 +255,10 @@ mod tests {
     #[tokio::test]
     async fn test_delete_dashboard() {
         let context = setup_test_environment();
-        let state = Arc::new(
-            AppState{
-                tauri: None,
-                db: Some(context.db.clone())
-            }
-        );
+        let state = Arc::new(AppState {
+            tauri: None,
+            db: Some(context.db.clone()),
+        });
         let app = Router::new()
             .route(&"/dashboard/:id", delete(delete_dashboard))
             .with_state(state);
@@ -281,13 +269,11 @@ mod tests {
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
-                description: "description 1".to_string()
-            }
+                description: "description 1".to_string(),
+            },
         );
 
-        let response = server
-            .delete(&format!("/dashboard/{}", dashboard.id))
-            .await;
+        let response = server.delete(&format!("/dashboard/{}", dashboard.id)).await;
 
         response.assert_status_ok();
 

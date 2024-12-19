@@ -2,10 +2,10 @@ pub mod models;
 pub mod repositories;
 
 use diesel::prelude::*;
-use tauri::{AppHandle, Manager, path::BaseDirectory};
+use tauri::{path::BaseDirectory, AppHandle, Manager};
 
 /// Establish a connection to the database
-/// 
+///
 /// This function is used to establish a connection to the database.
 /// It uses the `app` handle to get the path to the database file.
 /// The database file is located in the `AppLocalData` directory.
