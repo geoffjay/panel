@@ -1,12 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 
 import { invoke, Channel } from "@tauri-apps/api/core";
 
 import { Layout, UserTable } from "~components";
-import { User, columns as userColumns } from "~components/user-table";
+import { columns as userColumns } from "~components/user-table";
 import { Button } from "~components/ui/button";
-import { useMachineContext, EVENTS, STATES } from "~components/context/machine-provider";
-import { useUsers } from "~lib/hooks";
+import { useMachineContext, MachineState, EVENTS, STATES } from "~components/context/machine-provider";
+import { useGetUsersQuery } from "~lib/services";
 
 type AppEvent =
   | {
@@ -31,9 +31,13 @@ type AppEvent =
     };
 
 const Page: React.FC = () => {
-  const [users, setUsers] = useState<User[]>([]);
   const [current, send] = useMachineContext();
-  const { users: getUsers, error: userError } = useUsers();
+
+  const { data: users } = useGetUsersQuery();
+
+  useEffect(() => {
+    console.table(users);
+  }, [users]);
 
   const onEvent = new Channel<AppEvent>();
 
@@ -53,38 +57,28 @@ const Page: React.FC = () => {
     }
   };
 
-  const isLoading = current.name === STATES.LOADING;
-
-  useEffect(() => {
-    const fetchUsers = async () => {
-      const fetchedUsers = await getUsers();
-      if(fetchedUsers) {
-        setUsers(fetchedUsers);
-      }
-    };
-
-    if(current.name === "ready") {
-      fetchUsers();
-    }
-  }, [current]);
-
   const handleInitialize = async () => {
     await invoke("initialize", { onEvent });
   };
 
+  const renderComponent = (state: MachineState) => {
+    switch (state) {
+      case STATES.LAUNCHED:
+        return <Button onClick={handleInitialize}>Initialize</Button>;
+      case STATES.LOADING:
+        return <p>Loading...</p>;
+      case STATES.READY:
+        return (users &&
+          <div className="m-8">
+            <UserTable columns={userColumns} data={users} />
+          </div>
+        );
+    }
+  };
+
   return (
     <Layout>
-      <p>Current state: {current.name}</p>
-
-      {current.name === "launched" && (
-        <Button onClick={handleInitialize}>Initialize</Button>
-      )}
-
-      {isLoading && <p>Loading...</p>}
-
-      {(current.name === "ready" && users) &&
-        <UserTable columns={userColumns} data={users} />
-      }
+      {renderComponent(current.name)}
     </Layout>
   );
 };

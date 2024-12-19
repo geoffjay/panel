@@ -14,11 +14,9 @@ export const STATES = {
   READY: "ready",
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type MachineState = (typeof STATES)[keyof typeof STATES];
+export type MachineState = (typeof STATES)[keyof typeof STATES];
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type MachineEvent = 
+export type MachineEvent = 
   | { type: typeof EVENTS.LOADING_STARTED }
   | { type: typeof EVENTS.LOADING_PROGRESS }
   | { type: typeof EVENTS.LOADING_FINISHED };
