@@ -4,14 +4,8 @@ use serde::Deserialize;
 use std::sync::Arc;
 
 use crate::server::state::AppState;
-use crate::models::{Dashboard, NewDashboard};
-use crate::db::{
-    get_dashboard,
-    get_dashboards,
-    create_dashboard as create_dashboard_db,
-    update_dashboard as update_dashboard_db,
-    delete_dashboard as delete_dashboard_db
-};
+use crate::db::models::{Dashboard, NewDashboard};
+use crate::db::repositories::dashboard as repository;
 
 #[derive(Deserialize)]
 pub struct CreateDashboard {
@@ -32,11 +26,11 @@ pub struct DeleteDashboard {
 }
 
 pub async fn read_dashboard(
-    Path(dashboard_id): Path<i32>,
+    Path(id): Path<i32>,
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Dashboard>) {
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    let dashboard = get_dashboard(db, dashboard_id);
+    let dashboard = repository::get_dashboard(db, id);
 
     (
         StatusCode::OK,
@@ -48,7 +42,7 @@ pub async fn read_dashboards(
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Vec<Dashboard>>) {
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    let dashboards = get_dashboards(db);
+    let dashboards = repository::get_dashboards(db);
 
     (StatusCode::OK, Json(dashboards))
 }
@@ -58,7 +52,7 @@ pub async fn create_dashboard(
     Json(payload): Json<CreateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    let dashboard = create_dashboard_db(
+    let dashboard = repository::create_dashboard(
         db,
         NewDashboard { title: payload.title, description: payload.description }
     );
@@ -71,7 +65,7 @@ pub async fn update_dashboard(
     Json(payload): Json<UpdateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    let dashboard = update_dashboard_db(
+    let dashboard = repository::update_dashboard(
         db,
         Dashboard {
             id: payload.id,
@@ -88,7 +82,7 @@ pub async fn delete_dashboard(
     Path(id): Path<i32>,
 ) -> StatusCode {
     let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
-    delete_dashboard_db(db, id);
+    repository::delete_dashboard(db, id);
 
     StatusCode::OK
 }
@@ -104,8 +98,6 @@ mod tests {
     use diesel_migrations::MigrationHarness;
     use serde_json::json;
 
-    use crate::models::NewDashboard;
-    use crate::db::create_dashboard as create_dashboard_db;
     use crate::MIGRATIONS;
 
     struct TestContext {
@@ -137,7 +129,7 @@ mod tests {
 
         let server = TestServer::new(app).unwrap();
 
-        let dashboard = create_dashboard_db(
+        let dashboard = repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title".to_string(),
@@ -172,7 +164,7 @@ mod tests {
 
         let server = TestServer::new(app).unwrap();
 
-        create_dashboard_db(
+        repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
@@ -180,7 +172,7 @@ mod tests {
             }
         );
 
-        create_dashboard_db(
+        repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 2".to_string(),
@@ -245,7 +237,7 @@ mod tests {
 
         let server = TestServer::new(app).unwrap();
 
-        let dashboard = create_dashboard_db(
+        let dashboard = repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
@@ -285,7 +277,7 @@ mod tests {
 
         let server = TestServer::new(app).unwrap();
 
-        let dashboard = create_dashboard_db(
+        let dashboard = repository::create_dashboard(
             &mut *context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
@@ -299,7 +291,7 @@ mod tests {
 
         response.assert_status_ok();
 
-        let dashboards = get_dashboards(&mut *context.db.lock().unwrap());
+        let dashboards = repository::get_dashboards(&mut *context.db.lock().unwrap());
         assert_eq!(dashboards.len(), 0);
     }
 }

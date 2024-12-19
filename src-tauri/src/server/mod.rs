@@ -11,7 +11,10 @@ use tower_http::cors::{CorsLayer, Any};
 use tower::ServiceBuilder;
 use diesel::SqliteConnection;
 
-use crate::server::handlers::{root, create_user, read_users, read_user, update_user, delete_user};
+use crate::server::handlers::{
+    root, create_user, read_users, read_user, update_user, delete_user,
+    create_dashboard, read_dashboards, read_dashboard, update_dashboard, delete_dashboard,
+};
 use crate::server::state::AppState;
 
 #[tokio::main]
@@ -32,6 +35,11 @@ pub async fn init(tauri: AppHandle, db: SqliteConnection) -> io::Result<()> {
         .route("/users/:id", get(read_user))
         .route("/users", patch(update_user).with_state(shared_state.clone()))
         .route("/users", delete(delete_user).with_state(shared_state.clone()))
+        .route("/dashboards", get(read_dashboards).with_state(shared_state.clone()))
+        .route("/dashboards/:id", get(read_dashboard).with_state(shared_state.clone()))
+        .route("/dashboards", post(create_dashboard).with_state(shared_state.clone()))
+        .route("/dashboards", patch(update_dashboard).with_state(shared_state.clone()))
+        .route("/dashboards", delete(delete_dashboard).with_state(shared_state.clone()))
         .layer(ServiceBuilder::new().layer(cors_layer));
 
     let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();

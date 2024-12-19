@@ -5,7 +5,7 @@ import { invoke, Channel } from "@tauri-apps/api/core";
 import { Layout, UserTable } from "~components";
 import { columns as userColumns } from "~components/user-table";
 import { Button } from "~components/ui/button";
-import { useMachineContext, EVENTS, STATES } from "~components/context/machine-provider";
+import { useMachineContext, MachineState, EVENTS, STATES } from "~components/context/machine-provider";
 import { useGetUsersQuery } from "~lib/services";
 
 type AppEvent =
@@ -57,27 +57,28 @@ const Page: React.FC = () => {
     }
   };
 
-  const isLoading = current.name === STATES.LOADING;
-
   const handleInitialize = async () => {
     await invoke("initialize", { onEvent });
   };
 
+  const renderComponent = (state: MachineState) => {
+    switch (state) {
+      case STATES.LAUNCHED:
+        return <Button onClick={handleInitialize}>Initialize</Button>;
+      case STATES.LOADING:
+        return <p>Loading...</p>;
+      case STATES.READY:
+        return (users &&
+          <div className="m-8">
+            <UserTable columns={userColumns} data={users} />
+          </div>
+        );
+    }
+  };
+
   return (
     <Layout>
-      <p>Current state: {current.name}</p>
-
-      {current.name === "launched" && (
-        <Button onClick={handleInitialize}>Initialize</Button>
-      )}
-
-      {isLoading && <p>Loading...</p>}
-
-      {(current.name === "ready" && users) &&
-        <div className="m-8">
-          <UserTable columns={userColumns} data={users} />
-        </div>
-      }
+      {renderComponent(current.name)}
     </Layout>
   );
 };

@@ -9,7 +9,7 @@ export const dashboardApi = createApi({
   endpoints: (build) => ({
     getDashboard: build.query<Dashboard, number>({
       query: (id) => `dashboards/${id}`,
-      providesTags: (result, error, id) => [{ type: "Dashboards", id }],
+      providesTags: (_result, _error, id) => [{ type: "Dashboards", id }],
     }),
     getDashboards: build.query<Dashboard[], void>({
       query: () => "dashboards",
@@ -27,7 +27,7 @@ export const dashboardApi = createApi({
         method: "POST",
         body: dashboard,
       }),
-      invalidatesTags: (result, error, dashboard) => [
+      invalidatesTags: () => [
         { type: "Dashboards", id: "LIST" },
       ],
     }),
@@ -37,7 +37,7 @@ export const dashboardApi = createApi({
         method: "PUT",
         body: dashboard,
       }),
-      invalidatesTags: (result, error, dashboard) => [
+      invalidatesTags: (_result, _error, dashboard) => [
         { type: "Dashboards", id: dashboard.id },
       ],
     }),
@@ -46,7 +46,7 @@ export const dashboardApi = createApi({
         url: `dashboards/${id}`,
         method: "DELETE",
       }),
-      invalidatesTags: (result, error, id) => [
+      invalidatesTags: (_result, _error, id) => [
         { type: "Dashboards", id },
       ],
     }),

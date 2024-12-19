@@ -1,5 +1,4 @@
 mod db;
-mod models;
 mod schema;
 mod server;
 
