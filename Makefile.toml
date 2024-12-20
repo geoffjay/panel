@@ -3,9 +3,10 @@ command = "bun"
 args = ["run", "format"]
 
 [tasks.rs-format]
+cwd = "src-tauri"
 install_crate = "rustfmt"
 command = "cargo"
-args = ["fmt", "--manifest-path=./src-tauri/Cargo.toml", "--", "--emit=files"]
+args = ["fmt", "--", "--emit=files"]
 
 [tasks.format]
 dependencies = ["js-format", "rs-format"]
