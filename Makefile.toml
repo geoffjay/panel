@@ -2,19 +2,42 @@
 command = "bun"
 args = ["run", "format"]
 
+[tasks.js-lint]
+command = "bun"
+args = ["run", "lint"]
+
 [tasks.rs-format]
 cwd = "src-tauri"
 install_crate = "rustfmt"
 command = "cargo"
 args = ["fmt", "--", "--emit=files"]
 
+[tasks.rs-lint]
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--manifest-path", "src-tauri/Cargo.toml"]
+
+[tasks.rs-test]
+command = "cargo"
+args = ["test", "--verbose", "--manifest-path", "src-tauri/Cargo.toml"]
+
 [tasks.format]
 dependencies = ["js-format", "rs-format"]
+
+[tasks.lint]
+dependencies = ["js-lint", "rs-lint"]
+
+[tasks.test]
+dependencies = ["rs-test"]
 
 [tasks.clean]
 cwd = "src-tauri"
 command = "cargo"
 args = ["clean"]
+
+[tasks.dev]
+command = "bun"
+args = ["run", "tauri", "dev"]
+dependencies = ["clean"]
 
 [tasks.build]
 command = "bun"

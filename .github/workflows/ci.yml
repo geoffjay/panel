@@ -9,7 +9,7 @@ env:
   RUSTFLAGS: "-Dwarnings"
 
 jobs:
-  linting:
+  lint-js:
     name: Lint and test frontend code
     runs-on: ubuntu-latest
 
@@ -24,12 +24,12 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install frontend dependencies
-        run: npm install
+        run: bun install
 
       - name: Run bun lint
-        run: npm run lint
+        run: bun run lint
 
-  rust_testing:
+  lint-rust:
     name: Lint and test rust code
     runs-on: ubuntu-latest
     steps:

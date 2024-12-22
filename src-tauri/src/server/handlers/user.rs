@@ -19,11 +19,6 @@ pub struct UpdateUser {
     pub email: Option<String>,
 }
 
-#[derive(Deserialize)]
-pub struct DeleteUser {
-    pub id: u64,
-}
-
 #[derive(Serialize)]
 pub struct User {
     pub id: u64,
@@ -88,11 +83,4 @@ pub async fn update_user(
     };
 
     (StatusCode::OK, Json(user))
-}
-
-pub async fn delete_user(
-    State(_state): State<Arc<AppState>>,
-    Json(payload): Json<DeleteUser>,
-) -> (StatusCode, Json<&'static str>) {
-    (StatusCode::OK, Json("User deleted successfully"))
 }

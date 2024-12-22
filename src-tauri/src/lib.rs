@@ -15,6 +15,7 @@ pub const MIGRATIONS: EmbeddedMigrations = embed_migrations!("migrations");
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase", tag = "event", content = "data")]
+#[allow(clippy::enum_variant_names)]
 enum AppEvent<'a> {
     #[serde(rename_all = "camelCase")]
     LoadingStarted { id: usize },
@@ -28,7 +29,7 @@ enum AppEvent<'a> {
     LoadingFinished { id: usize },
 }
 
-impl<'a> fmt::Display for AppEvent<'a> {
+impl fmt::Display for AppEvent<'_> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             AppEvent::LoadingStarted { id } => write!(f, "LoadingStarted(id: {})", id),
@@ -52,7 +53,7 @@ fn initialize(_app: AppHandle, on_event: Channel<AppEvent>) {
         on_event
             .send(AppEvent::LoadingProgress {
                 id,
-                percent: percent,
+                percent,
                 message: "Loading...",
             })
             .unwrap();

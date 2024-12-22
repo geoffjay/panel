@@ -20,16 +20,11 @@ pub struct UpdateDashboard {
     pub description: Option<String>,
 }
 
-#[derive(Deserialize)]
-pub struct DeleteDashboard {
-    pub id: i32,
-}
-
 pub async fn read_dashboard(
     Path(id): Path<i32>,
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Dashboard>) {
-    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let db = &mut state.db.as_ref().unwrap().lock().unwrap();
     let dashboard = repository::get_dashboard(db, id);
 
     (StatusCode::OK, Json(dashboard))
@@ -38,7 +33,7 @@ pub async fn read_dashboard(
 pub async fn read_dashboards(
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Vec<Dashboard>>) {
-    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let db = &mut state.db.as_ref().unwrap().lock().unwrap();
     let dashboards = repository::get_dashboards(db);
 
     (StatusCode::OK, Json(dashboards))
@@ -48,7 +43,7 @@ pub async fn create_dashboard(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<CreateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
-    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let db = &mut state.db.as_ref().unwrap().lock().unwrap();
     let dashboard = repository::create_dashboard(
         db,
         NewDashboard {
@@ -64,7 +59,7 @@ pub async fn update_dashboard(
     State(state): State<Arc<AppState>>,
     Json(payload): Json<UpdateDashboard>,
 ) -> (StatusCode, Json<Dashboard>) {
-    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let db = &mut state.db.as_ref().unwrap().lock().unwrap();
     let dashboard = repository::update_dashboard(
         db,
         Dashboard {
@@ -81,7 +76,7 @@ pub async fn delete_dashboard(
     State(state): State<Arc<AppState>>,
     Path(id): Path<i32>,
 ) -> StatusCode {
-    let db = &mut *state.db.as_ref().unwrap().lock().unwrap();
+    let db = &mut state.db.as_ref().unwrap().lock().unwrap();
     repository::delete_dashboard(db, id);
 
     StatusCode::OK
@@ -124,13 +119,13 @@ mod tests {
             db: Some(context.db.clone()),
         });
         let app = Router::new()
-            .route(&"/dashboard/:id", get(read_dashboard))
+            .route("/dashboard/:id", get(read_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
         let dashboard = repository::create_dashboard(
-            &mut *context.db.lock().unwrap(),
+            &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title".to_string(),
                 description: "description".to_string(),
@@ -155,13 +150,13 @@ mod tests {
             db: Some(context.db.clone()),
         });
         let app = Router::new()
-            .route(&"/dashboard", get(read_dashboards))
+            .route("/dashboard", get(read_dashboards))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
         repository::create_dashboard(
-            &mut *context.db.lock().unwrap(),
+            &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
                 description: "description 1".to_string(),
@@ -169,7 +164,7 @@ mod tests {
         );
 
         repository::create_dashboard(
-            &mut *context.db.lock().unwrap(),
+            &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 2".to_string(),
                 description: "description 2".to_string(),
@@ -193,7 +188,7 @@ mod tests {
             db: Some(context.db.clone()),
         });
         let app = Router::new()
-            .route(&"/dashboard", post(create_dashboard))
+            .route("/dashboard", post(create_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
@@ -222,13 +217,13 @@ mod tests {
             db: Some(context.db.clone()),
         });
         let app = Router::new()
-            .route(&"/dashboard", put(update_dashboard))
+            .route("/dashboard", put(update_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
         let dashboard = repository::create_dashboard(
-            &mut *context.db.lock().unwrap(),
+            &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
                 description: "description 1".to_string(),
@@ -260,13 +255,13 @@ mod tests {
             db: Some(context.db.clone()),
         });
         let app = Router::new()
-            .route(&"/dashboard/:id", delete(delete_dashboard))
+            .route("/dashboard/:id", delete(delete_dashboard))
             .with_state(state);
 
         let server = TestServer::new(app).unwrap();
 
         let dashboard = repository::create_dashboard(
-            &mut *context.db.lock().unwrap(),
+            &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
                 description: "description 1".to_string(),
@@ -277,7 +272,7 @@ mod tests {
 
         response.assert_status_ok();
 
-        let dashboards = repository::get_dashboards(&mut *context.db.lock().unwrap());
+        let dashboards = repository::get_dashboards(&mut context.db.lock().unwrap());
         assert_eq!(dashboards.len(), 0);
     }
 }
