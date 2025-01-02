@@ -14,8 +14,8 @@ use tower::ServiceBuilder;
 use tower_http::cors::{Any, CorsLayer};
 
 use crate::server::handlers::{
-    create_dashboard, create_user, delete_dashboard, read_dashboard, read_dashboards,
-    read_user, read_users, root, update_dashboard, update_user,
+    create_dashboard, create_user, delete_dashboard, read_dashboard, read_dashboards, read_user,
+    read_users, root, update_dashboard, update_user,
 };
 use crate::server::state::AppState;
 

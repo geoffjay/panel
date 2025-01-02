@@ -20,8 +20,9 @@ tauri-build = { version = "2", features = [] }
 [dependencies]
 axum = { version = "0.7.9", features = ["macros"] }
 axum-test = "16.4.0"
-diesel = { version = "2.2.0", features = ["sqlite", "returning_clauses_for_sqlite_3_35"] }
+diesel = { version = "2.2.0", features = ["serde_json", "sqlite", "returning_clauses_for_sqlite_3_35"] }
 diesel_migrations = "2.2.0"
+dsync = "0.1.0"
 http = "1.2.0"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }

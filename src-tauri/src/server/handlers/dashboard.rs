@@ -25,18 +25,18 @@ pub async fn read_dashboard(
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Dashboard>) {
     let db = &mut state.db.as_ref().unwrap().lock().unwrap();
-    let dashboard = repository::get_dashboard(db, id);
+    let dashboard = repository::find_dashboard(db, id);
 
-    (StatusCode::OK, Json(dashboard))
+    (StatusCode::OK, Json(dashboard.unwrap()))
 }
 
 pub async fn read_dashboards(
     State(state): State<Arc<AppState>>,
 ) -> (StatusCode, Json<Vec<Dashboard>>) {
     let db = &mut state.db.as_ref().unwrap().lock().unwrap();
-    let dashboards = repository::get_dashboards(db);
+    let dashboards = repository::find_dashboards(db);
 
-    (StatusCode::OK, Json(dashboards))
+    (StatusCode::OK, Json(dashboards.unwrap()))
 }
 
 pub async fn create_dashboard(
@@ -48,11 +48,12 @@ pub async fn create_dashboard(
         db,
         NewDashboard {
             title: payload.title,
+            subtitle: "subtitle".to_string(),
             description: payload.description,
         },
     );
 
-    (StatusCode::CREATED, Json(dashboard))
+    (StatusCode::CREATED, Json(dashboard.unwrap()))
 }
 
 pub async fn update_dashboard(
@@ -65,11 +66,12 @@ pub async fn update_dashboard(
         Dashboard {
             id: payload.id,
             title: payload.title.unwrap(),
+            subtitle: "subtitle".to_string(),
             description: payload.description.unwrap(),
         },
     );
 
-    (StatusCode::OK, Json(dashboard))
+    (StatusCode::OK, Json(dashboard.unwrap()))
 }
 
 pub async fn delete_dashboard(
@@ -128,9 +130,11 @@ mod tests {
             &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title".to_string(),
+                subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
             },
-        );
+        )
+        .unwrap();
 
         let response = server.get(&format!("/dashboard/{}", dashboard.id)).await;
 
@@ -138,7 +142,8 @@ mod tests {
         response.assert_json_contains(&json!({
             "id": dashboard.id,
             "title": dashboard.title,
-            "description": dashboard.description
+            "description": dashboard.description,
+            "variables": []
         }));
     }
 
@@ -159,24 +164,28 @@ mod tests {
             &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
+                subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
             },
-        );
+        )
+        .unwrap();
 
         repository::create_dashboard(
             &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 2".to_string(),
+                subtitle: "subtitle 2".to_string(),
                 description: "description 2".to_string(),
             },
-        );
+        )
+        .unwrap();
 
         let response = server.get("/dashboard").await;
 
         response.assert_status_ok();
         response.assert_json_contains(&json!([
-            { "id": 1, "title": "title 1", "description": "description 1" },
-            { "id": 2, "title": "title 2", "description": "description 2" },
+            { "id": 1, "title": "title 1", "description": "description 1", "variables": [] },
+            { "id": 2, "title": "title 2", "description": "description 2", "variables": [] },
         ]));
     }
 
@@ -197,7 +206,8 @@ mod tests {
             .post("/dashboard")
             .json(&json!({
                 "title": "title",
-                "description": "description"
+                "description": "description",
+                "subtitle": "subtitle"
             }))
             .await;
 
@@ -205,7 +215,8 @@ mod tests {
         response.assert_json_contains(&json!({
             "id": 1,
             "title": "title",
-            "description": "description"
+            "description": "description",
+            "variables": []
         }));
     }
 
@@ -226,16 +237,19 @@ mod tests {
             &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
+                subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
             },
-        );
+        )
+        .unwrap();
 
         let response = server
             .put("/dashboard")
             .json(&json!({
                 "id": dashboard.id,
                 "title": "title 2",
-                "description": "description 2"
+                "description": "description 2",
+                "subtitle": "subtitle 2",
             }))
             .await;
 
@@ -243,7 +257,8 @@ mod tests {
         response.assert_json_contains(&json!({
             "id": dashboard.id,
             "title": "title 2",
-            "description": "description 2"
+            "description": "description 2",
+            "subtitle": "subtitle 2",
         }));
     }
 
@@ -264,15 +279,17 @@ mod tests {
             &mut context.db.lock().unwrap(),
             NewDashboard {
                 title: "title 1".to_string(),
+                subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
             },
-        );
+        )
+        .unwrap();
 
         let response = server.delete(&format!("/dashboard/{}", dashboard.id)).await;
 
         response.assert_status_ok();
 
-        let dashboards = repository::get_dashboards(&mut context.db.lock().unwrap());
+        let dashboards = repository::find_dashboards(&mut context.db.lock().unwrap()).unwrap();
         assert_eq!(dashboards.len(), 0);
     }
 }
