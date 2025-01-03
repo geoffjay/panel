@@ -1,12 +1,13 @@
 use diesel::prelude::*;
 
-use crate::db::models::{Dashboard, NewDashboard};
+use crate::db::models::{CreateDashboard, Dashboard};
 
 /// Get a dashboard by its id
 ///
 /// This function is used to get a dashboard by its id.
 /// It uses the `connection` to get the dashboard from the database.
 /// The `id` is the id of the dashboard to get.
+#[allow(dead_code)]
 pub fn find_dashboard(
     connection: &mut SqliteConnection,
     id: i32,
@@ -35,7 +36,7 @@ pub fn find_dashboards(
 /// The `dashboard` is the dashboard to create.
 pub fn create_dashboard(
     connection: &mut SqliteConnection,
-    dashboard: NewDashboard,
+    dashboard: CreateDashboard,
 ) -> Result<Dashboard, diesel::result::Error> {
     use crate::schema::dashboards::dsl;
 
@@ -107,7 +108,7 @@ mod tests {
         let mut context = setup_test_environment();
         let dashboard = create_dashboard(
             &mut context.connection,
-            NewDashboard {
+            CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
@@ -130,7 +131,7 @@ mod tests {
 
         create_dashboard(
             &mut context.connection,
-            NewDashboard {
+            CreateDashboard {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
@@ -140,7 +141,7 @@ mod tests {
 
         create_dashboard(
             &mut context.connection,
-            NewDashboard {
+            CreateDashboard {
                 title: "title 2".to_string(),
                 subtitle: "subtitle 2".to_string(),
                 description: "description 2".to_string(),
@@ -157,7 +158,7 @@ mod tests {
         let mut context = setup_test_environment();
         let dashboard = create_dashboard(
             &mut context.connection,
-            NewDashboard {
+            CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
@@ -186,7 +187,7 @@ mod tests {
         let mut context = setup_test_environment();
         let dashboard = create_dashboard(
             &mut context.connection,
-            NewDashboard {
+            CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),

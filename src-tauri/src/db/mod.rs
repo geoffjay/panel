@@ -4,6 +4,8 @@ pub mod repositories;
 use diesel::prelude::*;
 use tauri::{path::BaseDirectory, AppHandle, Manager};
 
+pub type ConnectionType = diesel::sqlite::SqliteConnection;
+
 /// Establish a connection to the database
 ///
 /// This function is used to establish a connection to the database.

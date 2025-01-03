@@ -1,15 +1,21 @@
-use dsync::{GenerationConfig, TableOptions};
-use std::{collections::HashMap, path::PathBuf};
+use dsync::GenerationConfig;
+use std::path::Path;
 
 pub fn main() {
     let dir = env!("CARGO_MANIFEST_DIR");
 
-    dsync::generate_files(
-        PathBuf::from_iter([dir, "src/schema.rs"]),
-        PathBuf::from_iter([dir, "src/db/models"]),
+    let result = dsync::generate_files(
+        Path::new(&dir).join("src").join("schema.rs").as_path(),
+        Path::new(&dir)
+            .join("src")
+            .join("db")
+            .join("models")
+            .as_path(),
         GenerationConfig {
-            connection_type: "diesel::sqlite::SqliteConnection",
+            connection_type: "diesel::sqlite::SqliteConnection".to_string(),
             options: Default::default(),
         },
     );
+
+    println!("{:?}", result);
 }

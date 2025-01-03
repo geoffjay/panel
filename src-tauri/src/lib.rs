@@ -1,8 +1,10 @@
 #![recursion_limit = "256"]
 
 mod db;
-mod schema;
 mod server;
+mod utils;
+#[rustfmt::skip]
+mod schema;
 
 use diesel::SqliteConnection;
 use diesel_migrations::{embed_migrations, EmbeddedMigrations, MigrationHarness};

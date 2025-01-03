@@ -11,9 +11,9 @@ CREATE TABLE `components`(
 
 CREATE TABLE `variables`(
 	`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`ref_id` VARCHAR,
-	`default` JSON,
-	`value` JSON NOT NULL,
+	`ref_id` TEXT,
+	`default` TEXT,
+	`value` TEXT NOT NULL,
 	`dashboard_id` INTEGER NOT NULL,
 	FOREIGN KEY (`dashboard_id`) REFERENCES `dashboards`(`id`)
 );

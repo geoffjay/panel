@@ -17,14 +17,6 @@ diesel::table! {
     }
 }
 
-// diesel::table! {
-//     component_children (id) {
-//         id -> Integer,
-//         parent_id -> Integer,
-//         child_id -> Integer,
-//     }
-// }
-
 diesel::table! {
     variables (id) {
         id -> Integer,
@@ -33,6 +25,28 @@ diesel::table! {
         default -> Nullable<Text>,
         value -> Text,
         dashboard_id -> Integer,
+    }
+}
+
+diesel::table! {
+    projects (id) {
+        id -> Integer,
+        name -> Text,
+        description -> Text,
+    }
+}
+
+diesel::table! {
+    devices (id) {
+        id -> Integer,
+        name -> Text,
+    }
+}
+
+diesel::table! {
+    project_devices (project_id, device_id) {
+        project_id -> Integer,
+        device_id -> Integer,
     }
 }
 
