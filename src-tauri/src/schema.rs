@@ -4,6 +4,7 @@ diesel::table! {
         title -> Text,
         subtitle -> Text,
         description -> Text,
+        project_id -> Integer,
     }
 }
 
@@ -25,33 +26,25 @@ diesel::table! {
         default -> Nullable<Text>,
         value -> Text,
         dashboard_id -> Integer,
+        project_id -> Integer,
     }
 }
 
 diesel::table! {
     projects (id) {
         id -> Integer,
-        name -> Text,
+        title -> Text,
+        subtitle -> Text,
         description -> Text,
     }
 }
 
-diesel::table! {
-    devices (id) {
-        id -> Integer,
-        name -> Text,
-    }
-}
-
-diesel::table! {
-    project_devices (project_id, device_id) {
-        project_id -> Integer,
-        device_id -> Integer,
-    }
-}
-
+diesel::joinable!(variables -> projects (project_id));
 diesel::joinable!(variables -> dashboards (dashboard_id));
 diesel::joinable!(components -> dashboards (dashboard_id));
+diesel::joinable!(dashboards -> projects (project_id));
 
+diesel::allow_tables_to_appear_in_same_query!(projects, variables);
+diesel::allow_tables_to_appear_in_same_query!(projects, dashboards);
 diesel::allow_tables_to_appear_in_same_query!(dashboards, variables);
 diesel::allow_tables_to_appear_in_same_query!(dashboards, components);

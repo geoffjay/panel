@@ -36,7 +36,7 @@ pub async fn read_dashboard(
 
     // Load associated variables
     let variables = Variable::belonging_to(&dashboard)
-        .load::<Variable>(&mut **connection)
+        .load::<Variable>(connection)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(DashboardResponse {

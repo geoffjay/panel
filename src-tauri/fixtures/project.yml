@@ -1,0 +1,76 @@
+---
+project:
+  app:
+    title: Sample
+    subtitle: A sample project
+
+  variables:
+    - name: value-0
+      type: string
+      default: "dummy value"
+    - name: value-1
+      type: float
+      default: 0.0
+    - name: value-2
+      type: float
+      default: 0.0
+
+  dashboard:
+    title: Dashboard
+    subtitle: A sample dashboard
+
+    components:
+      - type: stack
+        direction: vertical
+        children:
+          - type: panel
+            title: Measurements
+            subtitle: Acquisition inputs
+            children:
+              - type: stack
+                direction: horizontal
+                children:
+                  - type: stat
+                    title: Input 1
+                    value: ${value-1}
+                    description: Analog measurement
+          - type: panel
+            title: Signals
+            subtitle: Acquisition outputs
+            children:
+              - type: range
+                title: Output 1
+                value: ${value-2}
+
+  logging:
+    backend:
+      type: file
+      format: csv
+      pattern: "%Y-%m-%d.log"
+    columns:
+      - id: col-0
+        label: AI0
+        type: float
+        format: "%.2f"
+      - id: col-1
+        label: AO0
+        type: float
+        format: "%.2f"
+
+  acquisition:
+    channels:
+      - id: ai-0
+        type: input
+      - id: ao-0
+        type: output
+
+  connection:
+    connections:
+      - producer: ai-0
+        consumer:
+          - col-0
+          - value-0
+      - producer: value-2
+        consumer:
+          - ao-0
+          - col-1
