@@ -29,7 +29,7 @@ pub enum JsonValueType {
 }
 
 impl FromSql<diesel::sql_types::Text, Sqlite> for JsonValue {
-    fn from_sql<'a>(bytes: <Sqlite as Backend>::RawValue<'a>) -> deserialize::Result<Self> {
+    fn from_sql(bytes: <Sqlite as Backend>::RawValue<'_>) -> deserialize::Result<Self> {
         let str_value = <String as FromSql<diesel::sql_types::Text, Sqlite>>::from_sql(bytes)?;
         serde_json::from_str(&str_value).map_err(|e| e.into())
     }
@@ -245,7 +245,7 @@ mod tests {
         };
         let float_value = JsonValue {
             var_type: "float".to_string(),
-            value: JsonValueType::Float(3.14),
+            value: JsonValueType::Float(std::f64::consts::PI),
         };
         let bool_value = JsonValue {
             var_type: "bool".to_string(),

@@ -32,7 +32,7 @@ pub async fn read_dashboard(
     let connection = &mut state.db.as_ref().unwrap().lock().unwrap();
 
     // Load dashboard with its associated variables
-    let dashboard = Dashboard::find(&mut **connection, id).map_err(|_| StatusCode::NOT_FOUND)?;
+    let dashboard = Dashboard::find(connection, id).map_err(|_| StatusCode::NOT_FOUND)?;
 
     // Load associated variables
     let variables = Variable::belonging_to(&dashboard)
@@ -125,14 +125,14 @@ pub async fn update_dashboard(
     let connection = &mut state.db.as_ref().unwrap().lock().unwrap();
     
     // First find the existing dashboard
-    let existing = match Dashboard::find(&mut **connection, id) {
+    let existing = match Dashboard::find(connection, id) {
         Ok(dashboard) => dashboard,
         Err(_) => return (StatusCode::NOT_FOUND, Json(None)),
     };
 
     // Then update with new values, falling back to existing values if None
     match repository::update_dashboard(
-        &mut **connection,
+        connection,
         Dashboard {
             id,
             title: payload.title.unwrap_or(existing.title),
