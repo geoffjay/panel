@@ -39,12 +39,25 @@ diesel::table! {
     }
 }
 
+diesel::table! {
+    bindings (id) {
+        id -> Integer,
+        project_id -> Integer,
+        producer_ref -> Text,
+        producer_type -> Text,
+        consumer_ref -> Text,
+        consumer_type -> Text,
+    }
+}
+
 diesel::joinable!(variables -> projects (project_id));
 diesel::joinable!(variables -> dashboards (dashboard_id));
 diesel::joinable!(components -> dashboards (dashboard_id));
 diesel::joinable!(dashboards -> projects (project_id));
+diesel::joinable!(bindings -> projects (project_id));
 
 diesel::allow_tables_to_appear_in_same_query!(projects, variables);
 diesel::allow_tables_to_appear_in_same_query!(projects, dashboards);
+diesel::allow_tables_to_appear_in_same_query!(projects, bindings);
 diesel::allow_tables_to_appear_in_same_query!(dashboards, variables);
 diesel::allow_tables_to_appear_in_same_query!(dashboards, components);

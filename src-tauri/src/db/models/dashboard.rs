@@ -17,12 +17,13 @@ use crate::db::ConnectionType;
     Queryable,
     QueryableByName,
 )]
-#[diesel(table_name = crate::schema::dashboards, primary_key(id))]
+#[diesel(table_name = crate::schema::dashboards, primary_key(id), belongs_to(Project, foreign_key=project_id))]
 pub struct Dashboard {
     pub id: i32,
     pub title: String,
     pub subtitle: String,
     pub description: String,
+    pub project_id: i32,
 }
 
 /// Model to create a new dashboard
@@ -34,6 +35,7 @@ pub struct CreateDashboard {
     pub title: String,
     pub subtitle: String,
     pub description: String,
+    pub project_id: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, PartialEq, Default)]
@@ -42,6 +44,7 @@ pub struct UpdateDashboard {
     pub title: Option<String>,
     pub subtitle: Option<String>,
     pub description: Option<String>,
+    pub project_id: Option<i32>,
 }
 
 // TODO: Implement pagination in the db mod
@@ -55,37 +58,43 @@ pub struct UpdateDashboard {
 // }
 
 impl Dashboard {
-    pub fn new(title: String, subtitle: String, description: String) -> Self {
+    pub fn new(
+        title: String,
+        subtitle: String,
+        description: String,
+        project_id: i32,
+    ) -> Self {
         Self {
             id: 0,
             title,
             subtitle,
             description,
+            project_id,
         }
     }
 
-    pub fn find(db: &mut ConnectionType, id: i32) -> QueryResult<Self> {
+    pub fn find(connection: &mut ConnectionType, id: i32) -> QueryResult<Self> {
         use crate::schema::dashboards::dsl;
 
-        dsl::dashboards.find(id).first(db)
+        dsl::dashboards.find(id).first(connection)
     }
 
-    pub fn find_all(db: &mut ConnectionType) -> QueryResult<Vec<Self>> {
+    pub fn find_all(connection: &mut ConnectionType) -> QueryResult<Vec<Self>> {
         use crate::schema::dashboards::dsl;
 
-        dsl::dashboards.load::<Self>(db)
+        dsl::dashboards.load::<Self>(connection)
     }
 
-    pub fn create(db: &mut ConnectionType, item: &CreateDashboard) -> QueryResult<Self> {
+    pub fn create(connection: &mut ConnectionType, item: &CreateDashboard) -> QueryResult<Self> {
         use crate::schema::dashboards::dsl;
 
         diesel::insert_into(dsl::dashboards)
             .values(item)
-            .get_result::<Self>(db)
+            .get_result::<Self>(connection)
     }
 
     pub fn update(
-        db: &mut ConnectionType,
+        connection: &mut ConnectionType,
         param_id: i32,
         item: &UpdateDashboard,
     ) -> diesel::QueryResult<Self> {
@@ -94,13 +103,13 @@ impl Dashboard {
         diesel::update(dsl::dashboards.filter(dsl::id.eq(param_id)))
             .set(item)
             .returning(Dashboard::as_returning())
-            .get_result(db)
+            .get_result(connection)
     }
 
-    pub fn delete(db: &mut ConnectionType, param_id: i32) -> QueryResult<usize> {
+    pub fn delete(connection: &mut ConnectionType, param_id: i32) -> QueryResult<usize> {
         use crate::schema::dashboards::dsl;
 
-        diesel::delete(dsl::dashboards.filter(dsl::id.eq(param_id))).execute(db)
+        diesel::delete(dsl::dashboards.filter(dsl::id.eq(param_id))).execute(connection)
     }
 }
 
@@ -115,6 +124,7 @@ mod tests {
             "Test Dashboard".to_string(),
             "This is a test dashboard".to_string(),
             "This is a test dashboard".to_string(),
+            1,
         );
 
         let serialized = serde_json::to_string(&dashboard).unwrap();
@@ -132,6 +142,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -154,6 +165,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -172,6 +184,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -195,6 +208,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -206,6 +220,7 @@ mod tests {
                 title: Some("Updated Test Dashboard".to_string()),
                 subtitle: Some("This is an updated test dashboard".to_string()),
                 description: Some("This is an updated test dashboard".to_string()),
+                project_id: Some(1),
             },
         )
         .unwrap();
@@ -230,6 +245,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();

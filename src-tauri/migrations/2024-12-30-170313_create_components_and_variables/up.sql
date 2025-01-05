@@ -11,10 +11,12 @@ CREATE TABLE `components`(
 
 CREATE TABLE `variables`(
 	`id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-	`ref_id` TEXT,
+	`ref_id` VARCHAR,
 	`default` TEXT,
 	`value` TEXT NOT NULL,
 	`dashboard_id` INTEGER NOT NULL,
-	FOREIGN KEY (`dashboard_id`) REFERENCES `dashboards`(`id`)
+	`project_id` INTEGER NOT NULL,
+	FOREIGN KEY (`dashboard_id`) REFERENCES `dashboards`(`id`),
+	FOREIGN KEY (`project_id`) REFERENCES `projects`(`id`)
 );
 

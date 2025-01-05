@@ -61,6 +61,7 @@ pub struct Variable {
     pub default: Option<JsonValue>,
     pub value: JsonValue,
     pub dashboard_id: i32,
+    pub project_id: i32,
 }
 
 impl PartialEq for Variable {
@@ -70,6 +71,7 @@ impl PartialEq for Variable {
             && self.default == other.default
             && self.value == other.value
             && self.dashboard_id == other.dashboard_id
+            && self.project_id == other.project_id
     }
 }
 
@@ -80,6 +82,7 @@ pub struct CreateVariable {
     pub default: Option<JsonValue>,
     pub value: JsonValue,
     pub dashboard_id: i32,
+    pub project_id: i32,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, AsChangeset, PartialEq, Default)]
@@ -89,11 +92,13 @@ pub struct UpdateVariable {
     pub default: Option<Option<JsonValue>>,
     pub value: Option<JsonValue>,
     pub dashboard_id: Option<i32>,
+    pub project_id: Option<i32>,
 }
 
 impl Variable {
     pub fn new(
         dashboard_id: i32,
+        project_id: i32,
         ref_id: Option<String>,
         default: Option<JsonValue>,
         value: JsonValue,
@@ -104,41 +109,42 @@ impl Variable {
             default,
             value,
             dashboard_id,
+            project_id,
         }
     }
 
-    pub fn find(db: &mut ConnectionType, id: i32) -> QueryResult<Self> {
+    pub fn find(connection: &mut ConnectionType, id: i32) -> QueryResult<Self> {
         use crate::schema::variables::dsl;
 
-        dsl::variables.find(id).first(db)
+        dsl::variables.find(id).first(connection)
     }
 
-    pub fn find_all(db: &mut ConnectionType) -> QueryResult<Vec<Self>> {
+    pub fn find_all(connection: &mut ConnectionType) -> QueryResult<Vec<Self>> {
         use crate::schema::variables::dsl;
 
-        dsl::variables.load::<Self>(db)
+        dsl::variables.load::<Self>(connection)
     }
 
-    pub fn create(db: &mut ConnectionType, item: &CreateVariable) -> QueryResult<Self> {
+    pub fn create(connection: &mut ConnectionType, item: &CreateVariable) -> QueryResult<Self> {
         use crate::schema::variables::dsl;
 
         diesel::insert_into(dsl::variables)
             .values(item)
-            .get_result::<Self>(db)
+            .get_result::<Self>(connection)
     }
 
-    pub fn update(db: &mut ConnectionType, id: i32, item: &UpdateVariable) -> QueryResult<Self> {
+    pub fn update(connection: &mut ConnectionType, id: i32, item: &UpdateVariable) -> QueryResult<Self> {
         use crate::schema::variables::dsl;
 
         diesel::update(dsl::variables.find(id))
             .set(item)
-            .get_result(db)
+            .get_result(connection)
     }
 
-    pub fn delete(db: &mut ConnectionType, id: i32) -> QueryResult<usize> {
+    pub fn delete(connection: &mut ConnectionType, id: i32) -> QueryResult<usize> {
         use crate::schema::variables::dsl;
 
-        diesel::delete(dsl::variables.find(id)).execute(db)
+        diesel::delete(dsl::variables.find(id)).execute(connection)
     }
 }
 
@@ -173,6 +179,7 @@ mod tests {
                 value: JsonValueType::String("test".to_string()),
             },
             dashboard_id: 0,
+            project_id: 1,
         };
 
         let var2 = Variable {
@@ -184,6 +191,7 @@ mod tests {
                 value: JsonValueType::String("test".to_string()),
             },
             dashboard_id: 0,
+            project_id: 1,
         };
 
         let var3 = Variable {
@@ -195,6 +203,7 @@ mod tests {
                 value: JsonValueType::String("different".to_string()),
             },
             dashboard_id: 0,
+            project_id: 1,
         };
 
         assert_eq!(var1, var2);
@@ -212,6 +221,7 @@ mod tests {
                 value: JsonValueType::String("test".to_string()),
             },
             dashboard_id: 0,
+            project_id: 1,
         };
 
         let serialized = serde_json::to_string(&var).unwrap();
@@ -277,6 +287,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -291,6 +302,7 @@ mod tests {
                     value: JsonValueType::String("test".to_string()),
                 },
                 dashboard_id: dashboard.id,
+                project_id: 1,
             },
         )
         .unwrap();
@@ -314,6 +326,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -328,6 +341,7 @@ mod tests {
                     value: JsonValueType::String("test".to_string()),
                 },
                 dashboard_id: dashboard.id,
+                project_id: 1,
             },
         )
         .unwrap();
@@ -353,6 +367,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -367,6 +382,7 @@ mod tests {
                     value: JsonValueType::String("test".to_string()),
                 },
                 dashboard_id: dashboard.id,
+                project_id: 1,
             },
         )
         .unwrap();
@@ -382,6 +398,7 @@ mod tests {
                     value: JsonValueType::String("test".to_string()),
                 }),
                 dashboard_id: Some(dashboard.id),
+                project_id: Some(1),
             },
         )
         .unwrap();
@@ -408,6 +425,7 @@ mod tests {
                 title: "Test Dashboard".to_string(),
                 subtitle: "This is a test dashboard".to_string(),
                 description: "This is a test dashboard".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -422,6 +440,7 @@ mod tests {
                     value: JsonValueType::String("test".to_string()),
                 },
                 dashboard_id: dashboard.id,
+                project_id: 1,
             },
         )
         .unwrap();

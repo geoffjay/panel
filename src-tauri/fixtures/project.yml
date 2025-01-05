@@ -5,13 +5,13 @@ project:
     subtitle: A sample project
 
   variables:
-    - name: value-0
+    - name: value0
       type: string
       default: "dummy value"
-    - name: value-1
+    - name: value1
       type: float
       default: 0.0
-    - name: value-2
+    - name: value2
       type: float
       default: 0.0
 
@@ -32,7 +32,7 @@ project:
                 children:
                   - type: stat
                     title: Input 1
-                    value: ${value-1}
+                    value: ${value1}
                     description: Analog measurement
           - type: panel
             title: Signals
@@ -40,37 +40,44 @@ project:
             children:
               - type: range
                 title: Output 1
-                value: ${value-2}
+                value: ${value2}
 
   logging:
+    name: csv
     backend:
       type: file
       format: csv
+      path: "/tmp/panel/logs"
       pattern: "%Y-%m-%d.log"
+      rate: 1000
     columns:
-      - id: col-0
+      - name: col0
         label: AI0
         type: float
         format: "%.2f"
-      - id: col-1
+      - name: col1
         label: AO0
         type: float
         format: "%.2f"
 
   acquisition:
-    channels:
-      - id: ai-0
-        type: input
-      - id: ao-0
-        type: output
+    devices:
+      - name: device0
+        type: multifunction
+        channels:
+          - name: ai0
+            type: input
+            label: AI0
+          - name: ao0
+            type: output
+            label: AO0
 
-  connection:
-    connections:
-      - producer: ai-0
-        consumer:
-          - col-0
-          - value-0
-      - producer: value-2
-        consumer:
-          - ao-0
-          - col-1
+  bindings:
+    - producer: devices:device0/ai0
+      consumers:
+        - logging:csv/col0
+        - variables:value1
+    - producer: variables:value2
+      consumers:
+        - devices:device0/ao0
+        - logging:csv/col1

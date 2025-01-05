@@ -112,6 +112,7 @@ mod tests {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -135,6 +136,7 @@ mod tests {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -145,6 +147,7 @@ mod tests {
                 title: "title 2".to_string(),
                 subtitle: "subtitle 2".to_string(),
                 description: "description 2".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -162,6 +165,7 @@ mod tests {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -173,6 +177,7 @@ mod tests {
                 title: "title 2".to_string(),
                 subtitle: "subtitle 2".to_string(),
                 description: "description 2".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -191,6 +196,7 @@ mod tests {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();

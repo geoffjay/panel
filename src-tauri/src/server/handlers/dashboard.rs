@@ -36,7 +36,7 @@ pub async fn read_dashboard(
 
     // Load associated variables
     let variables = Variable::belonging_to(&dashboard)
-        .load::<Variable>(connection)
+        .load::<Variable>(&mut **connection)
         .map_err(|_| StatusCode::INTERNAL_SERVER_ERROR)?;
 
     Ok(Json(DashboardResponse {
@@ -93,6 +93,7 @@ pub async fn create_dashboard(
             title: payload.title,
             subtitle: payload.subtitle,
             description: payload.description,
+            project_id: 1,
         },
     ) {
         Ok(dashboard) => {
@@ -138,6 +139,7 @@ pub async fn update_dashboard(
             title: payload.title.unwrap_or(existing.title),
             subtitle: payload.subtitle.unwrap_or(existing.subtitle),
             description: payload.description.unwrap_or(existing.description),
+            project_id: 1,
         },
     ) {
         Ok(dashboard) => {
@@ -201,6 +203,7 @@ mod tests {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
                 description: "description".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -235,6 +238,7 @@ mod tests {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -245,6 +249,7 @@ mod tests {
                 title: "title 2".to_string(),
                 subtitle: "subtitle 2".to_string(),
                 description: "description 2".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -276,7 +281,8 @@ mod tests {
             .json(&json!({
                 "title": "title",
                 "description": "description",
-                "subtitle": "subtitle"
+                "subtitle": "subtitle",
+                "project_id": 1
             }))
             .await;
 
@@ -285,7 +291,8 @@ mod tests {
             "id": 1,
             "title": "title",
             "description": "description",
-            "variables": []
+            "variables": [],
+            "project_id": 1
         }));
     }
 
@@ -308,6 +315,7 @@ mod tests {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
@@ -351,6 +359,7 @@ mod tests {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
                 description: "description 1".to_string(),
+                project_id: 1,
             },
         )
         .unwrap();
