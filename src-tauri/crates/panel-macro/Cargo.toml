@@ -1,0 +1,19 @@
+[package]
+name = "panel_macro"
+version = "0.1.0"
+description = "Panel Macros"
+authors = ["Geoff Johnson <geoff.jay@gmail.com>"]
+edition = "2021"
+
+[lib]
+name = "panel_macro"
+proc-macro = true
+
+[dependencies]
+diesel = { version = "2.2.0", features = [
+  "sqlite",
+  "returning_clauses_for_sqlite_3_35",
+] }
+proc-macro2 = "1.0"
+quote = "1.0"
+syn = { version = "2.0", features = ["full"] }

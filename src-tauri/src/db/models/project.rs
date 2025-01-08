@@ -1,7 +1,17 @@
 use diesel::prelude::*;
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Identifiable, Selectable, Queryable, QueryableByName)]
+#[derive(
+    Debug,
+    Clone,
+    Serialize,
+    Deserialize,
+    PartialEq,
+    Identifiable,
+    Selectable,
+    Queryable,
+    QueryableByName,
+)]
 #[diesel(table_name = crate::schema::projects, primary_key(id))]
 pub struct Project {
     pub id: i32,

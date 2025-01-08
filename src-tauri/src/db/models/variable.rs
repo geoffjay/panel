@@ -8,7 +8,7 @@ use diesel::{
 };
 use serde::{Deserialize, Serialize};
 
-use crate::db::models::Dashboard;
+use crate::db::models::{Dashboard, Project};
 use crate::db::ConnectionType;
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, FromSqlRow, AsExpression)]
@@ -54,7 +54,12 @@ impl ToSql<diesel::sql_types::Text, Sqlite> for JsonValue {
     Associations,
     Identifiable,
 )]
-#[diesel(table_name=crate::schema::variables, primary_key(id), belongs_to(Dashboard, foreign_key=dashboard_id))]
+#[diesel(
+    table_name=crate::schema::variables,
+    primary_key(id),
+    belongs_to(Dashboard, foreign_key=dashboard_id),
+    belongs_to(Project, foreign_key=project_id)
+)]
 pub struct Variable {
     pub id: i32,
     pub ref_id: Option<String>,
@@ -133,7 +138,11 @@ impl Variable {
             .get_result::<Self>(connection)
     }
 
-    pub fn update(connection: &mut ConnectionType, id: i32, item: &UpdateVariable) -> QueryResult<Self> {
+    pub fn update(
+        connection: &mut ConnectionType,
+        id: i32,
+        item: &UpdateVariable,
+    ) -> QueryResult<Self> {
         use crate::schema::variables::dsl;
 
         diesel::update(dsl::variables.find(id))

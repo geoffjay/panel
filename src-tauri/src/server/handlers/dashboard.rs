@@ -1,8 +1,8 @@
 use axum::extract::{Path, State};
 use axum::{http::StatusCode, response::Json};
+use diesel::{BelongingToDsl, RunQueryDsl};
 use serde::Serialize;
 use std::sync::Arc;
-use diesel::{BelongingToDsl, RunQueryDsl};
 
 use crate::db::models::{CreateDashboard, Dashboard, UpdateDashboard, Variable};
 use crate::db::repositories::dashboard as repository;
@@ -61,10 +61,13 @@ pub async fn read_dashboards(
     let connection = &mut state.db.as_ref().unwrap().lock().unwrap();
     match repository::find_dashboards(connection) {
         Ok(dashboards) => {
-            let dashboards_response = dashboards.into_iter().map(|dashboard| DashboardResponse {
-                dashboard,
-                variables: vec![],
-            }).collect();
+            let dashboards_response = dashboards
+                .into_iter()
+                .map(|dashboard| DashboardResponse {
+                    dashboard,
+                    variables: vec![],
+                })
+                .collect();
             (StatusCode::OK, Json(dashboards_response))
         }
         Err(_) => (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![])),
@@ -124,7 +127,7 @@ pub async fn update_dashboard(
     Json(payload): Json<UpdateDashboard>,
 ) -> (StatusCode, Json<Option<DashboardResponse>>) {
     let connection = &mut state.db.as_ref().unwrap().lock().unwrap();
-    
+
     // First find the existing dashboard
     let existing = match Dashboard::find(connection, id) {
         Ok(dashboard) => dashboard,

@@ -1,6 +1,7 @@
 use diesel::prelude::*;
 
 use crate::db::models::{CreateDashboard, Dashboard};
+use crate::db::ConnectionType;
 
 /// Get a dashboard by its id
 ///
@@ -9,7 +10,7 @@ use crate::db::models::{CreateDashboard, Dashboard};
 /// The `id` is the id of the dashboard to get.
 #[allow(dead_code)]
 pub fn find_dashboard(
-    connection: &mut SqliteConnection,
+    connection: &mut ConnectionType,
     id: i32,
 ) -> Result<Dashboard, diesel::result::Error> {
     use crate::schema::dashboards::dsl;
@@ -22,7 +23,7 @@ pub fn find_dashboard(
 /// This function is used to get all dashboards.
 /// It uses the `connection` to get the dashboards from the database.
 pub fn find_dashboards(
-    connection: &mut SqliteConnection,
+    connection: &mut ConnectionType,
 ) -> Result<Vec<Dashboard>, diesel::result::Error> {
     use crate::schema::dashboards::dsl;
 
@@ -35,7 +36,7 @@ pub fn find_dashboards(
 /// It uses the `connection` to create the dashboard in the database.
 /// The `dashboard` is the dashboard to create.
 pub fn create_dashboard(
-    connection: &mut SqliteConnection,
+    connection: &mut ConnectionType,
     dashboard: CreateDashboard,
 ) -> Result<Dashboard, diesel::result::Error> {
     use crate::schema::dashboards::dsl;
@@ -52,7 +53,7 @@ pub fn create_dashboard(
 /// It uses the `connection` to update the dashboard in the database.
 /// The `dashboard` is the dashboard to update.
 pub fn update_dashboard(
-    connection: &mut SqliteConnection,
+    connection: &mut ConnectionType,
     dashboard: Dashboard,
 ) -> Result<Dashboard, diesel::result::Error> {
     use crate::schema::dashboards::dsl;
@@ -72,7 +73,7 @@ pub fn update_dashboard(
 /// It uses the `connection` to delete the dashboard from the database.
 /// The `id` is the id of the dashboard to delete.
 pub fn delete_dashboard(
-    connection: &mut SqliteConnection,
+    connection: &mut ConnectionType,
     id: i32,
 ) -> Result<(), diesel::result::Error> {
     use crate::schema::dashboards::dsl;
@@ -85,29 +86,13 @@ pub fn delete_dashboard(
 #[cfg(test)]
 mod tests {
     use super::*;
-    use diesel_migrations::MigrationHarness;
-
-    use crate::MIGRATIONS;
-
-    struct TestContext {
-        connection: SqliteConnection,
-    }
-
-    fn setup_test_environment() -> TestContext {
-        let database_url = ":memory:".to_string();
-        let mut connection = SqliteConnection::establish(&database_url)
-            .unwrap_or_else(|_| panic!("Error connecting to {}", database_url));
-
-        connection.run_pending_migrations(MIGRATIONS).unwrap();
-
-        TestContext { connection }
-    }
+    use crate::utils::test_helpers::setup_test_environment;
 
     #[test]
     fn test_find_dashboard() {
-        let mut context = setup_test_environment();
+        let context = setup_test_environment();
         let dashboard = create_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
@@ -116,7 +101,8 @@ mod tests {
             },
         )
         .unwrap();
-        let found_dashboard = find_dashboard(&mut context.connection, dashboard.id).unwrap();
+        let found_dashboard =
+            find_dashboard(&mut context.connection.lock().unwrap(), dashboard.id).unwrap();
 
         assert_eq!(dashboard.id, found_dashboard.id);
         assert_eq!(dashboard.title, found_dashboard.title);
@@ -125,13 +111,13 @@ mod tests {
 
     #[test]
     fn test_find_dashboards() {
-        let mut context = setup_test_environment();
-        let dashboards = find_dashboards(&mut context.connection).unwrap();
+        let context = setup_test_environment();
+        let dashboards = find_dashboards(&mut context.connection.lock().unwrap()).unwrap();
 
         assert_eq!(dashboards.len(), 0);
 
         create_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             CreateDashboard {
                 title: "title 1".to_string(),
                 subtitle: "subtitle 1".to_string(),
@@ -142,7 +128,7 @@ mod tests {
         .unwrap();
 
         create_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             CreateDashboard {
                 title: "title 2".to_string(),
                 subtitle: "subtitle 2".to_string(),
@@ -152,15 +138,15 @@ mod tests {
         )
         .unwrap();
 
-        let dashboards = find_dashboards(&mut context.connection).unwrap();
+        let dashboards = find_dashboards(&mut context.connection.lock().unwrap()).unwrap();
         assert_eq!(dashboards.len(), 2);
     }
 
     #[test]
     fn test_update_dashboard() {
-        let mut context = setup_test_environment();
+        let context = setup_test_environment();
         let dashboard = create_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
@@ -171,7 +157,7 @@ mod tests {
         .unwrap();
 
         let updated_dashboard = update_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             Dashboard {
                 id: dashboard.id,
                 title: "title 2".to_string(),
@@ -189,9 +175,9 @@ mod tests {
 
     #[test]
     fn test_delete_dashboard() {
-        let mut context = setup_test_environment();
+        let context = setup_test_environment();
         let dashboard = create_dashboard(
-            &mut context.connection,
+            &mut context.connection.lock().unwrap(),
             CreateDashboard {
                 title: "title".to_string(),
                 subtitle: "subtitle".to_string(),
@@ -201,8 +187,8 @@ mod tests {
         )
         .unwrap();
 
-        delete_dashboard(&mut context.connection, dashboard.id).unwrap();
-        let dashboards = find_dashboards(&mut context.connection).unwrap();
+        delete_dashboard(&mut context.connection.lock().unwrap(), dashboard.id).unwrap();
+        let dashboards = find_dashboards(&mut context.connection.lock().unwrap()).unwrap();
         assert_eq!(dashboards.len(), 0);
     }
 }

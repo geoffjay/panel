@@ -2767,7 +2767,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "panel-ng"
+name = "panel"
 version = "0.1.0"
 dependencies = [
  "axum",
@@ -2778,6 +2778,7 @@ dependencies = [
  "http 1.2.0",
  "log",
  "mockall",
+ "panel_macro",
  "serde",
  "serde_json",
  "tauri",
@@ -2787,6 +2788,16 @@ dependencies = [
  "tokio",
  "tower",
  "tower-http",
+]
+
+[[package]]
+name = "panel_macro"
+version = "0.1.0"
+dependencies = [
+ "diesel",
+ "proc-macro2",
+ "quote",
+ "syn 2.0.90",
 ]
 
 [[package]]

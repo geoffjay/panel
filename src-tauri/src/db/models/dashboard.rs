@@ -58,12 +58,7 @@ pub struct UpdateDashboard {
 // }
 
 impl Dashboard {
-    pub fn new(
-        title: String,
-        subtitle: String,
-        description: String,
-        project_id: i32,
-    ) -> Self {
+    pub fn new(title: String, subtitle: String, description: String, project_id: i32) -> Self {
         Self {
             id: 0,
             title,
