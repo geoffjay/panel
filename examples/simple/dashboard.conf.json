@@ -1,0 +1,54 @@
+{
+  "type": "layout",
+  "children": [
+    {
+      "type": "stack",
+      "properties": {
+        "direction": "vertical"
+      },
+      "children": [
+        {
+          "type": "panel",
+          "properties": {
+            "title": "Measurements",
+            "subtitle": "Acquisition inputs"
+          },
+          "children": [
+            {
+              "type": "stack",
+              "properties": {
+                "direction": "horizontal"
+              },
+              "children": [
+                {
+                  "type": "stat",
+                  "properties": {
+                    "title": "Input 1",
+                    "value": "${value-0}",
+                    "description": "Analog measurement"
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "type": "panel",
+          "properties": {
+            "title": "Signals",
+            "subtitle": "Acquisition outputs"
+          },
+          "children": [
+            {
+              "type": "range",
+              "properties": {
+                "title": "Output 1",
+                "value": "${value-1}"
+              }
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

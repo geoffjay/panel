@@ -1,85 +1,96 @@
 import React, { useEffect } from "react";
+import { useNavigate } from "react-router";
+import { ChevronRight, Trash2 } from "lucide-react";
 
-import { invoke, Channel } from "@tauri-apps/api/core";
+import { open } from "@tauri-apps/plugin-dialog";
 
-import { Layout, UserTable } from "~components";
-import { columns as userColumns } from "~components/user-table";
 import { Button } from "~components/ui/button";
-import { useMachineContext, MachineState, EVENTS, STATES } from "~components/context/machine-provider";
-import { useGetUsersQuery } from "~lib/services";
-
-type AppEvent =
-  | {
-      event: "loadingStarted";
-      data: {
-        id: number;
-      };
-    }
-  | {
-      event: "loadingProgress";
-      data: {
-        id: number;
-        percent: number;
-        message: string;
-      };
-    }
-  | {
-      event: "loadingFinished";
-      data: {
-        id: number;
-      };
-    };
+import { useProjectStore } from "~lib/store/projects";
 
 const Page: React.FC = () => {
-  const [current, send] = useMachineContext();
-
-  const { data: users } = useGetUsersQuery();
+  const { projects, fetchProjects, createProject, deleteProject } =
+    useProjectStore();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    console.table(users);
-  }, [users]);
+    fetchProjects();
+  }, []);
 
-  const onEvent = new Channel<AppEvent>();
+  const handleOpenFolder = async () => {
+    const file = await open({
+      multiple: false,
+      directory: true,
+    });
 
-  onEvent.onmessage = (message) => {
-    console.log(`got app event ${message.event}`);
+    if (file) {
+      const newProject = await createProject({
+        name: "New Project",
+        description: "New Project",
+        path: file,
+      });
 
-    switch (message.event) {
-      case "loadingStarted":
-        send({ type: EVENTS.LOADING_STARTED, data: message.data });
-        break;
-      case "loadingProgress":
-        send({ type: EVENTS.LOADING_PROGRESS, data: message.data });
-        break;
-      case "loadingFinished":
-        send({ type: EVENTS.LOADING_FINISHED, data: message.data });
-        break;
+      if (newProject !== null && newProject.id !== undefined) {
+        navigate(`/project/${newProject.id}`);
+      }
     }
   };
 
-  const handleInitialize = async () => {
-    await invoke("initialize", { onEvent });
-  };
-
-  const renderComponent = (state: MachineState) => {
-    switch (state) {
-      case STATES.LAUNCHED:
-        return <Button onClick={handleInitialize}>Initialize</Button>;
-      case STATES.LOADING:
-        return <p>Loading...</p>;
-      case STATES.READY:
-        return (users &&
-          <div className="m-8">
-            <UserTable columns={userColumns} data={users} />
-          </div>
-        );
+  const handleDelete = (id: number | undefined) => async () => {
+    if (id) {
+      await deleteProject(id);
     }
   };
 
   return (
-    <Layout>
-      {renderComponent(current.name)}
-    </Layout>
+    <div className="h-screen w-[640px] m-auto flex flex-col justify-center items-center gap-4">
+      <div className="flex gap-2 align-start w-full">
+        <h1 className="text-lg font-bold">Recent Projects</h1>
+      </div>
+      <div className="w-full rounded-lg bg-white p-4 drop-shadow-md max-h-[400px] overflow-y-auto">
+        {projects.length === 0 ? (
+          <div className="text-center text-gray-500 py-4">
+            <p>No projects yet!</p>
+            <p className="text-sm">
+              Create a new project or open an existing folder to get started.
+            </p>
+          </div>
+        ) : (
+          projects.map((project, index) => (
+            <div
+              className={`flex justify-between ${index !== projects.length - 1 ? "border-b border-gray-200 pb-3 mb-3" : ""}`}
+              key={project.id}
+            >
+              <div className="flex-col gap-2">
+                <h2 className="text-md font-bold">{project.name}</h2>
+                <p className="text-sm text-gray-500 italic">{project.path}</p>
+              </div>
+              <div className="flex">
+                <Button
+                  variant="ghost"
+                  className="p-2"
+                  onClick={handleDelete(project.id)}
+                >
+                  <Trash2 className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+                </Button>
+                <Button
+                  variant="ghost"
+                  className="p-2"
+                  onClick={() => navigate(`/project/${project.id}`)}
+                >
+                  <ChevronRight className="w-4 h-4 text-zinc-700 dark:text-zinc-300" />
+                </Button>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+      <div className="flex gap-2">
+        <Button onClick={() => navigate("/project/new")}>
+          Create Project...
+        </Button>
+        <Button onClick={handleOpenFolder}>Open Folder...</Button>
+      </div>
+    </div>
   );
 };
 

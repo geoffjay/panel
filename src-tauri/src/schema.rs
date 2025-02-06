@@ -33,9 +33,9 @@ diesel::table! {
 diesel::table! {
     projects (id) {
         id -> Integer,
-        title -> Text,
-        subtitle -> Text,
+        name -> Text,
         description -> Text,
+        path -> Text,
     }
 }
 

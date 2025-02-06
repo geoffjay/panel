@@ -1,0 +1,24 @@
+import { Stack, Text } from "~components/dashboard";
+
+## Stack
+
+### Basic Usage
+
+<Stack {...props}>
+  <h1>Example</h1>
+  <Text>Stack demonstration</Text>
+</Stack>
+
+#### Configuration
+
+```yaml
+layout:
+  components:
+    - type: stack
+      direction: vertical
+      children:
+        - type: text
+          value: Example
+        - type: text
+          value: Stack demonstration
+```

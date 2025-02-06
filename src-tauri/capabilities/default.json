@@ -3,5 +3,11 @@
   "identifier": "default",
   "description": "Capability for the main window",
   "windows": ["main"],
-  "permissions": ["core:default", "shell:allow-open", "log:default"]
+  "permissions": [
+    "core:default",
+    "core:window:allow-set-fullscreen",
+    "dialog:default",
+    "log:default",
+    "shell:allow-open"
+  ]
 }

@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Panel"
 authors = ["Geoff Johnson <geoff.jay@gmail.com>"]
 edition = "2021"
+default-run = "panel"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -25,9 +26,9 @@ tauri-build = { version = "2", features = [] }
 axum = { version = "0.7.9", features = ["macros"] }
 axum-test = "16.4.0"
 diesel = { version = "2.2.0", features = [
-  "serde_json",
-  "sqlite",
-  "returning_clauses_for_sqlite_3_35",
+    "serde_json",
+    "sqlite",
+    "returning_clauses_for_sqlite_3_35",
 ] }
 diesel_migrations = "2.2.0"
 dsync = "0.1.0"
@@ -35,13 +36,14 @@ http = "1.2.0"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-tauri = { version = "2", features = ["custom-protocol"] }
+tauri = { version = "2", features = ["custom-protocol", "tray-icon"] }
 tauri-plugin-log = "2"
 tauri-plugin-shell = "2"
 tokio = "1.42.0"
 tower = "0.5.1"
 tower-http = { version = "0.6.2", features = ["cors"] }
 panel_macro = { path = "crates/panel-macro" }
+tauri-plugin-dialog = "2"
 
 [dev-dependencies]
 mockall = "0.13"

@@ -11,14 +11,21 @@ export default defineConfig({
     alias: {
       "~": fileURLToPath(new URL("./src", import.meta.url)),
       "~root": fileURLToPath(new URL("./src", import.meta.url)),
-      "~components": fileURLToPath(new URL("./src/components", import.meta.url)),
+      "~components": fileURLToPath(
+        new URL("./src/components", import.meta.url),
+      ),
       "~features": fileURLToPath(new URL("./src/features", import.meta.url)),
       "~lib": fileURLToPath(new URL("./src/lib", import.meta.url)),
       "@": fileURLToPath(new URL("./src", import.meta.url)),
     },
   },
   plugins: [
-    { enforce: "pre", ...mdx({/* jsxImportSource: …, otherOptions… */ }) },
+    {
+      enforce: "pre",
+      ...mdx({
+        /* jsxImportSource: …, otherOptions… */
+      }),
+    },
     react({ include: /\.(jsx|js|mdx|md|tsx|ts)$/ }),
   ],
 
@@ -33,10 +40,10 @@ export default defineConfig({
     host: host || false,
     hmr: host
       ? {
-        protocol: "ws",
-        host,
-        port: 1421,
-      }
+          protocol: "ws",
+          host,
+          port: 1421,
+        }
       : undefined,
     watch: {
       // 3. tell vite to ignore watching `src-tauri`

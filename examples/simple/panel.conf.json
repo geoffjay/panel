@@ -1,0 +1,6 @@
+{
+  "$schema": "https://github.com/geoffjay/panel/blob/main/panel.schema.json",
+  "title": "Panel",
+  "subtitle": "Simple Panel",
+  "icon": "assets/icon.png"
+}

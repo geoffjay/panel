@@ -2,7 +2,7 @@ extern crate proc_macro;
 
 use proc_macro2::TokenStream;
 use quote::quote;
-use syn::{parse_macro_input, Attribute, DeriveInput};
+use syn::{parse_macro_input, DeriveInput};
 
 #[proc_macro_derive(Readable, attributes(entity, table))]
 pub fn readable_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
@@ -12,30 +12,15 @@ pub fn readable_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 }
 
 fn impl_readable(input: DeriveInput) -> TokenStream {
-    // Get the struct name (e.g., FooRepository)
     let struct_name = &input.ident;
-
-    // Extract entity and table names from attributes
-    let entity_type = "Project".to_string();
-    let table_name = "projects".to_string();
-
-    // for attr in &input.attrs {
-    //     if let Some(ident) = attr.path().get_ident() {
-    //         match ident.to_string().as_str() {
-    //             "entity" => {
-    //                 entity_type = Some(parse_entity_attribute(attr));
-    //             }
-    //             "table" => {
-    //                 table_name = Some(parse_table_attribute(attr));
-    //             }
-    //             _ => continue,
-    //         }
-    //     }
-    // }
-
-    // let entity_type = entity_type.unwrap().unwrap();
-    // let table_name = table_name.unwrap().unwrap();
-    
+    let entity_type: String = fetch_attr("entity", &input.attrs)
+        .expect("Please supply an entity attribute")
+        .parse()
+        .expect("entity should be a string");
+    let table_name: String = fetch_attr("table", &input.attrs)
+        .expect("Please supply a table attribute")
+        .parse()
+        .expect("table should be a string");
     let entity_ident = syn::Ident::new(&entity_type, proc_macro2::Span::call_site());
     let table_ident = syn::Ident::new(&table_name, proc_macro2::Span::call_site());
 
@@ -49,24 +34,30 @@ fn impl_readable(input: DeriveInput) -> TokenStream {
     }
 }
 
-fn parse_entity_attribute(attr: &Attribute) -> syn::Result<String> {
-    let meta = attr.parse_args::<syn::Meta>()?;
-    println!("{:?}", meta);
-    // if let syn::Meta::NameValue(meta) = meta {
-    //     if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(lit_str), .. }) = meta.value {
-    //         return Ok(lit_str.value());
-    //     }
-    // }
-    Ok(String::new())
-}
+/// Fetch an attribute string from the derived struct.
+fn fetch_attr(name: &str, attrs: &[syn::Attribute]) -> Option<String> {
+    for attr in attrs {
+        if let Ok(meta) = attr.parse_args::<syn::Meta>() {
+            match meta {
+                syn::Meta::NameValue(nv) => {
+                    if nv.path.get_ident().map(|i| i.to_string()) == Some(name.to_string()) {
+                        match nv.value {
+                            syn::Expr::Lit(syn::ExprLit {
+                                lit: syn::Lit::Str(lit_str),
+                                ..
+                            }) => return Some(lit_str.value()),
+                            _ => {
+                                panic!("attribute {} should be a string", name);
+                            }
+                        }
+                    }
+                }
+                _ => {
+                    panic!("attribute {} should be a string", name);
+                }
+            }
+        }
+    }
 
-fn parse_table_attribute(attr: &Attribute) -> syn::Result<String> {
-    let meta = attr.parse_args::<syn::Meta>()?;
-    println!("{:?}", meta);
-    // if let syn::Meta::NameValue(meta) = meta {
-    //     if let syn::Expr::Lit(syn::ExprLit { lit: syn::Lit::Str(lit_str), .. }) = meta.value {
-    //         return Ok(lit_str.value());
-    //     }
-    // }
-    Ok(String::new())
+    None
 }

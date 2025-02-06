@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/geoffjay/panel/blob/main/schema/panel.schema.json",
+  "title": "Panel Configuration",
+  "description": "A configuration for a panel",
+  "type": "object",
+  "properties": {
+    "title": {
+      "description": "The title of the panel",
+      "default": "Panel",
+      "type": "string"
+    },
+    "subtitle": {
+      "description": "The subtitle of the panel",
+      "default": "Simple Panel",
+      "type": "string"
+    },
+    "icon": {
+      "description": "The icon of the panel",
+      "type": ["string", "null"]
+    },
+    "dashboard": {
+      "description": "The dashboard of the panel",
+      "$ref": "https://github.com/geoffjay/panel/blob/main/schema/dashboard.schema.json"
+    }
+  }
+}

@@ -5,7 +5,7 @@ use serde::Serialize;
 use std::sync::Arc;
 
 use crate::db::models::{CreateDashboard, Dashboard, UpdateDashboard, Variable};
-use crate::db::repositories::dashboard as repository;
+use crate::repositories::dashboard as repository;
 use crate::server::state::AppState;
 
 #[derive(Debug, Serialize)]
