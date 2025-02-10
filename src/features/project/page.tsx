@@ -2,27 +2,36 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router";
 
 import { Loader } from "~components";
-import { useProjectStore } from "~/lib/store/projects";
-import { Project } from "~/lib/types";
+import { DashboardFactory } from "~lib/factories/dashboard";
+import { useProjectStore } from "~lib/store/projects";
+import { useDashboardStore } from "~lib/store/dashboard";
+import { DashboardConfig } from "~lib/types/dashboard";
 
 const Page: React.FC = () => {
   const { id } = useParams();
-  const [project, setProject] = useState<Project | undefined>(undefined);
+  const [dashboard, setDashboard] = useState<DashboardConfig | undefined>(
+    undefined,
+  );
   const { error, isLoading, getProject } = useProjectStore();
+  const { getDashboardByProject } = useDashboardStore();
 
   useEffect(() => {
     const loadDashboard = async (id: string) => {
       const project = await getProject(id);
-      setProject(project);
-
-      // const dashboard = await getDashboardByProject(project);
-      // setDashboard(dashboard);
+      if (project) {
+        const dashboard = await getDashboardByProject(project);
+        setDashboard(dashboard);
+      }
     };
 
     if (id) {
       loadDashboard(id);
     }
   }, [id]);
+
+  useEffect(() => {
+    console.log(dashboard);
+  }, [dashboard]);
 
   return (
     <div className="pt-12 pb-2 px-2">
@@ -32,7 +41,10 @@ const Page: React.FC = () => {
         </div>
       )}
       {error && <div>Error: {error.message}</div>}
-      {project && <div>Project {project.id}</div>}
+      {dashboard &&
+        dashboard.children.map((child) =>
+          DashboardFactory.createComponent(child).render(),
+        )}
     </div>
   );
 };

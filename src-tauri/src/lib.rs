@@ -4,6 +4,7 @@ mod app;
 mod db;
 mod repositories;
 mod server;
+mod types;
 mod utils;
 #[rustfmt::skip]
 mod schema;

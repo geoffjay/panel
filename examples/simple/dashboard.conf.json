@@ -1,5 +1,4 @@
 {
-  "type": "layout",
   "children": [
     {
       "type": "stack",
@@ -27,6 +26,22 @@
                     "value": "${value-0}",
                     "description": "Analog measurement"
                   }
+                },
+                {
+                  "type": "stat",
+                  "properties": {
+                    "title": "Input 2",
+                    "value": "${value-1}",
+                    "description": "Analog measurement"
+                  }
+                },
+                {
+                  "type": "stat",
+                  "properties": {
+                    "title": "Input 3",
+                    "value": "${value-2}",
+                    "description": "Analog measurement"
+                  }
                 }
               ]
             }
@@ -43,7 +58,9 @@
               "type": "range",
               "properties": {
                 "title": "Output 1",
-                "value": "${value-1}"
+                "value": "${value-1}",
+                "min": 0,
+                "max": 100
               }
             }
           ]

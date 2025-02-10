@@ -22,3 +22,7 @@ export interface DashboardComponentConfig {
 export interface DashboardComponent {
   render: () => React.ReactNode;
 }
+
+export interface DashboardConfig {
+  children: DashboardComponentConfig[];
+}

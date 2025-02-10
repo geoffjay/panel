@@ -11,14 +11,23 @@ import { Stack, Text } from "~components/dashboard";
 
 #### Configuration
 
-```yaml
-layout:
-  components:
-    - type: stack
-      direction: vertical
-      children:
-        - type: text
-          value: Example
-        - type: text
-          value: Stack demonstration
+```json
+{
+  "children": [
+    {
+      "type": "stack",
+      "direction": "vertical",
+      "children": [
+        {
+          "type": "text",
+          "value": "Example"
+        },
+        {
+          "type": "text",
+          "value": "Stack demonstration"
+        }
+      ]
+    }
+  ]
+}
 ```

@@ -2,15 +2,18 @@ import { create } from "zustand";
 
 import { invoke } from "@tauri-apps/api/core";
 
-import { Dashboard, Project } from "~lib/types";
+import { Project } from "~lib/types";
+import { DashboardConfig } from "~lib/types/dashboard";
 
-type ProjectStore = {
+type DashboardStore = {
   isLoading: boolean;
   error: Error | null;
-  getDashboardByProject: (project: Project) => Promise<Dashboard | null>;
+  getDashboardByProject: (
+    project: Project,
+  ) => Promise<DashboardConfig | undefined>;
 };
 
-export const useProjectStore = create<ProjectStore>((set) => ({
+export const useDashboardStore = create<DashboardStore>((set) => ({
   isLoading: false,
   error: null,
   getDashboardByProject: async (project: Project) => {
@@ -18,11 +21,11 @@ export const useProjectStore = create<ProjectStore>((set) => ({
     const dashboard = await invoke("get_dashboard_by_project", { project })
       .then((dashboard) => {
         set({ isLoading: false });
-        return dashboard as Dashboard;
+        return dashboard as DashboardConfig;
       })
       .catch((e) => {
         set({ error: e, isLoading: false });
-        return null;
+        return undefined;
       });
 
     return dashboard;

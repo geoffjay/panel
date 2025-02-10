@@ -25,7 +25,7 @@ const Layout: React.FC<Props> = ({ className }: Props) => {
   const [isFullscreen, setIsFullscreen] = useState(false);
   const navigate = useNavigate();
 
-  const classes = `${className || ""}h-screen bg-zinc-100 dark:bg-zinc-900`;
+  const classes = `${className || ""}h-full min-h-screen bg-zinc-100 dark:bg-zinc-900`;
 
   useEffect(() => {
     const handleKeyDown = async (event: KeyboardEvent) => {

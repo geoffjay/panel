@@ -68,10 +68,12 @@ const Page: React.FC = () => {
         </div>
       </div>
       <p className="text-sm text-gray-400 italic w-full ml-8 mb-4">
-        The path where the project will be created and where project files will be stored.
+        The path where the project will be created and where project files will
+        be stored.
       </p>
-      <div className="flex justify-end">
+      <div className="flex justify-end gap-2">
         <Button onClick={handleCreateProject}>Create</Button>
+        <Button onClick={() => navigate("/")}>Cancel</Button>
       </div>
     </div>
   );

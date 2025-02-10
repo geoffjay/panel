@@ -10,6 +10,7 @@ import {
 } from "~components/ui/select";
 import { Input } from "~components/ui/input";
 import { Label } from "~components/ui/label";
+import { Slider } from "~components/ui/slider";
 
 type ExampleType = React.FC<ExampleProps> & {
   // Static subcomponents added to the Example component
@@ -56,16 +57,15 @@ const RangeControl: React.FC<RangeControlProps> = ({
   onChange,
 }: RangeControlProps) => (
   <div className="flex flex-row gap-4">
-    <label htmlFor={id} className="text-zinc-700 my-auto min-w-[120px]">
+    <Label htmlFor={id} className="text-zinc-700 my-auto min-w-[120px]">
       {label}
-    </label>
-    <input
+    </Label>
+    <Slider
       id={id}
-      className="range bg-zinc-200 w-full max-w-xs"
-      type="range"
+      className="bg-zinc-200 w-full max-w-xs"
       min={min}
       max={max}
-      value={value}
+      value={[value]}
       onChange={onChange}
     />
   </div>

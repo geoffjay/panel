@@ -1,33 +1,15 @@
 import React from "react";
 
-// XXX: this file was produced from a prompt, and isn't 100% accurate yet, it needs:
-// - to use the real components
-// - to use the object returned by the "backend"
-// - each component should have a mapping from config.properties to props
+import { Panel, Range, Stack, Stat, Text } from "~components/dashboard";
 
 import {
   DashboardComponentConfig,
   DashboardComponent,
 } from "~lib/types/dashboard";
 
-const Layout: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
-  <div>{children}</div>
-);
-const Stack: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
-  <div>{children}</div>
-);
-const Text: React.FC = () => <div>Text</div>;
-const Stat: React.FC = () => <div>Stat</div>;
-const Panel: React.FC<{ children?: React.ReactNode }> = ({ children }) => (
-  <div>{children}</div>
-);
-const Range: React.FC = () => <div>Range</div>;
-
 export class DashboardFactory {
   static createComponent(config: DashboardComponentConfig): DashboardComponent {
     switch (config.type) {
-      case "layout":
-        return new LayoutComponent(config);
       case "stack":
         return new StackComponent(config);
       case "text":
@@ -44,59 +26,65 @@ export class DashboardFactory {
   }
 }
 
-class LayoutComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
+abstract class BaseComponent implements DashboardComponent {
+  constructor(protected config: DashboardComponentConfig) {}
 
-  render() {
-    const children = this.config.children?.map((child) =>
+  protected getChildren(): React.ReactNode[] | undefined {
+    return this.config.children?.map((child) =>
       DashboardFactory.createComponent(child).render(),
     );
-    return <Layout>{children}</Layout>;
+  }
+
+  protected getProperties(): { [key: string]: any }[] {
+    console.log(this.config);
+
+    if (!this.config.properties) return [];
+
+    // If properties is already an array, return it transformed to objects
+    if (Array.isArray(this.config.properties)) {
+      return this.config.properties.map((property) => ({
+        [property.name]: property.value,
+      }));
+    }
+
+    // If properties is a hash/object, convert it to array of objects
+    return Object.entries(this.config.properties).map(([key, value]) => ({
+      [key]: value,
+    }));
+  }
+
+  abstract render(): React.JSX.Element;
+}
+
+class PanelComponent extends BaseComponent {
+  render() {
+    return <Panel {...this.getProperties()}>{this.getChildren()}</Panel>;
   }
 }
 
-class StackComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
-
+class RangeComponent extends BaseComponent {
   render() {
-    const children = this.config.children?.map((child) =>
-      DashboardFactory.createComponent(child).render(),
-    );
-    return <Stack>{children}</Stack>;
+    const props = Object.assign({}, ...(this.getProperties() || []));
+    return <Range {...props} />;
   }
 }
 
-class TextComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
-
+class StackComponent extends BaseComponent {
   render() {
-    return <Text />;
+    return <Stack {...this.getProperties()}>{this.getChildren()}</Stack>;
   }
 }
 
-class StatComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
-
+class StatComponent extends BaseComponent {
   render() {
-    return <Stat />;
+    const props = Object.assign({}, ...(this.getProperties() || []));
+    return <Stat {...props} />;
   }
 }
 
-class PanelComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
-
+class TextComponent extends BaseComponent {
   render() {
-    const children = this.config.children?.map((child) =>
-      DashboardFactory.createComponent(child).render(),
-    );
-    return <Panel>{children}</Panel>;
-  }
-}
-
-class RangeComponent implements DashboardComponent {
-  constructor(private config: DashboardComponentConfig) {}
-
-  render() {
-    return <Range />;
+    const props = Object.assign({}, ...(this.getProperties() || []));
+    return <Text {...props} />;
   }
 }

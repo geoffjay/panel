@@ -1,7 +1,7 @@
 import React from "react";
 
 interface StackProps {
-  direction: string;
+  direction?: string;
   children?: React.ReactNode;
 }
 
