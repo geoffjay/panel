@@ -16,10 +16,27 @@ All notable changes to this project will be documented in this file.
 - Add database and methods
 - Use database for all dashboard endpoints
 - Add model tests
+- Add make tasks
+- Add components and variables to data model
+- Add tests
+- Add projects table
+- Add projects model types
+- Attempt derive macro for repository
+- Add component MDX preview
+- Add dashboard factory
+
+### 🐛 Bug Fixes
+
+- Make linter happy
+- Linting
 
 ### 🚜 Refactor
 
 - Move dashboard things into modules
+
+### ⚙️ Miscellaneous Tasks
+
+- Add ci workflow
 
 ### Core
 
