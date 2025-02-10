@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [unreleased]
+## [[0.1](https://github.com/geoffjay/panel/releases/tag/v0.1)] - 2025-02-10
 
 ### 🚀 Features
 
@@ -24,6 +24,7 @@ All notable changes to this project will be documented in this file.
 - Attempt derive macro for repository
 - Add component MDX preview
 - Add dashboard factory
+- Update changelog
 
 ### 🐛 Bug Fixes
 
