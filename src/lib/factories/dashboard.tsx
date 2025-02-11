@@ -35,6 +35,7 @@ abstract class BaseComponent implements DashboardComponent {
     );
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected getProperties(): { [key: string]: any }[] {
     console.log(this.config);
 

@@ -29,7 +29,9 @@ const StackExample: React.FC = () => {
 
   return (
     <Example
-      content={<Stack components={MDXComponents} direction={direction} />}
+      content={
+        <Stack {...{ components: MDXComponents, direction: direction }} />
+      }
       controls={<Controls />}
     />
   );

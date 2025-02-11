@@ -25,7 +25,7 @@ const RangeExample: React.FC = () => {
 
   return (
     <Example
-      content={<Range components={MDXComponents} defaultValue={50} />}
+      content={<Range {...{ components: MDXComponents, defaultValue: 50 }} />}
       controls={<Controls />}
     />
   );

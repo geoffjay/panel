@@ -2,11 +2,7 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": [
-      "ES2020",
-      "DOM",
-      "DOM.Iterable"
-    ],
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
     "module": "ESNext",
     "skipLibCheck": true,
     /* Bundler mode */
@@ -23,41 +19,26 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "~root": [
-        "./src"
-      ],
-      "~root/*": [
-        "./src/*"
-      ],
-      "~components": [
-        "./src/components"
-      ],
-      "~components/*": [
-        "./src/components/*"
-      ],
-      "~features": [
-        "./src/features"
-      ],
-      "~features/*": [
-        "./src/features/*"
-      ],
-      "~lib": [
-        "./src/lib"
-      ],
-      "~lib/*": [
-        "./src/lib/*"
-      ],
-      "@/*": [
-        "./src/*"
-      ]
+      "~/*": ["./src/*"],
+      "~root": ["./src"],
+      "~root/*": ["./src/*"],
+      "~components": ["./src/components"],
+      "~components/*": ["./src/components/*"],
+      "~features": ["./src/features"],
+      "~features/*": ["./src/features/*"],
+      "~lib": ["./src/lib"],
+      "~lib/*": ["./src/lib/*"],
+      "@/*": ["./src/*"]
     },
     "types": ["vitest/globals"]
   },
   "include": [
-    "src"
+    "src/**/*.js",
+    "src/**/*.jsx",
+    "src/**/*.ts",
+    "src/**/*.tsx",
+    "src/**/*.mdx",
+    "src/**/*.d.ts"
   ],
   "references": [
     {

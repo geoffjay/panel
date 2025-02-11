@@ -55,7 +55,7 @@ const TextExample: React.FC = () => {
 
   return (
     <Example
-      content={<Text components={MDXComponents} content={content} />}
+      content={<Text {...{ components: MDXComponents, content: content }} />}
       controls={<Controls />}
     />
   );

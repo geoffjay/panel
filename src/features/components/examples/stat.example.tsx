@@ -9,11 +9,8 @@ interface ExampleContextType {
   title: string;
   value: string;
   description: string;
-  // eslint-disable-next-line no-unused-vars
   updateTitle?: (title: string) => void;
-  // eslint-disable-next-line no-unused-vars
   updateValue?: (value: string) => void;
-  // eslint-disable-next-line no-unused-vars
   updateDescription?: (description: string) => void;
 }
 
@@ -92,10 +89,12 @@ const StatExample: React.FC = () => {
     <Example
       content={
         <Stat
-          components={MDXComponents}
-          title={title}
-          value={value}
-          description={description}
+          {...{
+            components: MDXComponents,
+            title: title,
+            value: value,
+            description: description,
+          }}
         />
       }
       controls={<Controls />}

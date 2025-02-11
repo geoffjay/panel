@@ -5,7 +5,12 @@ import { invoke, Channel } from "@tauri-apps/api/core";
 import { UserTable } from "~components";
 import { columns as userColumns } from "~components/user-table";
 import { Button } from "~components/ui/button";
-import { useMachineContext, MachineState, EVENTS, STATES } from "~components/context/machine-provider";
+import {
+  useMachineContext,
+  MachineState,
+  EVENTS,
+  STATES,
+} from "~components/context/machine-provider";
 import { useGetUsersQuery } from "~lib/services";
 
 type AppEvent =
@@ -68,21 +73,19 @@ const Page: React.FC = () => {
       case STATES.LOADING:
         return <p>Loading...</p>;
       case STATES.READY:
-        return (users &&
-          <div className="mx-8">
-            <UserTable columns={userColumns} data={users} />
-          </div>
+        return (
+          users && (
+            <div className="mx-8">
+              <UserTable columns={userColumns} data={users} />
+            </div>
+          )
         );
       default:
         return null;
     }
   };
 
-  return (
-    <>
-      {renderComponent(current.name)}
-    </>
-  );
+  return <>{current?.name && renderComponent(current.name as MachineState)}</>;
 };
 
 export default Page;
