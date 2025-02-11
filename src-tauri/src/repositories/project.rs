@@ -38,12 +38,12 @@ impl Repository<Project, CreateProject, UpdateProject> for ProjectRepository {
     fn update(
         connection: &mut ConnectionType,
         id: i32,
-        project: UpdateProject,
+        item: UpdateProject,
     ) -> Result<Project, diesel::result::Error> {
         use crate::schema::projects::dsl;
 
         diesel::update(dsl::projects.find(id))
-            .set(&project)
+            .set(&item)
             .returning(Project::as_returning())
             .get_result(connection)
     }

@@ -10,6 +10,7 @@ pub trait Repository<T, C, U> {
     fn all(connection: &mut ConnectionType) -> Result<Vec<T>, diesel::result::Error>;
     fn find(connection: &mut ConnectionType, id: i32) -> Result<T, diesel::result::Error>;
     fn create(connection: &mut ConnectionType, item: C) -> Result<T, diesel::result::Error>;
+    #[allow(unused)]
     fn update(
         connection: &mut ConnectionType,
         id: i32,

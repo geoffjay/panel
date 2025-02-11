@@ -7,7 +7,6 @@ import Text from "./text.mdx";
 
 interface ExampleContextType {
   content: string;
-  // eslint-disable-next-line no-unused-vars
   updateContent?: (value: string) => void;
 }
 

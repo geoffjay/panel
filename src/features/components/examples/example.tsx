@@ -44,7 +44,6 @@ interface RangeControlProps {
   min?: number;
   max?: number;
   value: number;
-  // eslint-disable-next-line no-unused-vars
   onChange: (event: React.FormEvent<HTMLInputElement>) => void;
 }
 
@@ -81,7 +80,6 @@ interface SelectControlProps {
   label: string;
   options: Array<OptionType>;
   value: string;
-  // eslint-disable-next-line no-unused-vars
   onChange: (value: string) => void;
 }
 
@@ -119,7 +117,6 @@ interface TextInputControlProps {
   id: string;
   label: string;
   value: string;
-  // eslint-disable-next-line no-unused-vars
   onChange: (event: React.FormEvent<HTMLInputElement>) => void;
 }
 
