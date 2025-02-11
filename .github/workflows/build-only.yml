@@ -1,4 +1,4 @@
-name: "build-only"
+name: Build
 
 on:
   workflow_dispatch:
