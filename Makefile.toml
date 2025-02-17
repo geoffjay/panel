@@ -15,11 +15,11 @@ args = ["fmt", "--", "--emit=files"]
 [tasks.rs-lint]
 command = "cargo"
 args = [
-  "clippy",
-  "--all-targets",
-  "--all-features",
-  "--manifest-path",
-  "src-tauri/Cargo.toml",
+    "clippy",
+    "--all-targets",
+    "--all-features",
+    "--manifest-path",
+    "src-tauri/Cargo.toml",
 ]
 
 [tasks.rs-test]
@@ -34,10 +34,6 @@ dependencies = ["js-lint", "rs-lint"]
 
 [tasks.test]
 dependencies = ["rs-test"]
-
-[tasks.dsync]
-command = "cargo"
-args = ["run", "--manifest-path", "src-tauri/Cargo.toml", "--bin", "dsync"]
 
 [tasks.clean]
 cwd = "src-tauri"

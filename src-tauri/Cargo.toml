@@ -15,10 +15,6 @@ default-run = "panel"
 name = "panel_lib"
 crate-type = ["staticlib", "cdylib", "rlib"]
 
-[[bin]]
-name = "dsync"
-path = "bin/dsync.rs"
-
 [build-dependencies]
 tauri-build = { version = "2", features = [] }
 
@@ -31,7 +27,6 @@ diesel = { version = "2.2.0", features = [
     "returning_clauses_for_sqlite_3_35",
 ] }
 diesel_migrations = "2.2.0"
-dsync = "0.1.0"
 http = "1.2.0"
 log = "0.4"
 serde = { version = "1", features = ["derive"] }
