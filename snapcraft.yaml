@@ -50,7 +50,7 @@ parts:
   build-app:
     plugin: dump
     build-snaps:
-      - bun-js/latest/stable
+      - node/20/stable
       - rustup/latest/stable
     build-packages:
       - libwebkit2gtk-4.1-dev
@@ -71,6 +71,7 @@ parts:
 
     override-build: |
       set -eu
+      npm install -g bun
       bun install
       rustup default stable
       bun run tauri build --bundles deb
